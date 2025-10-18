@@ -1,109 +1,298 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Trade Job Tracker
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A simple, mobile-first job tracking system built for construction trade businesses. Designed to minimize friction for foremen in the field while giving business owners powerful oversight and reporting capabilities.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## Project Overview
 
-## Features
+This application helps trade businesses track jobs completed by their crews. Foremen can quickly log job details from their phones at the job site, while admins get a comprehensive view of all operations with powerful filtering and reporting tools.
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+## Core Requirements
 
-## Demo
+### Must Have (MVP - Iteration 1)
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+#### Job Tracking
 
-## Deploy to Vercel
+- **Job Fields:**
+  - Date (auto-populated on submission)
+  - Job name/number
+  - Elevation
+  - Lot/Address
+  - Yardage (numeric input)
+  - Rate (dollar amount)
+  - Total (auto-calculated: yardage × rate)
+  - Crew ID (auto-populated based on user's crew)
+  - Notes (optional)
 
-Vercel deployment will guide you through creating a Supabase account and project.
+#### User Roles & Authentication
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+- **Admin Role:**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+  - View all jobs across all crews
+  - Manage users (add, edit, remove)
+  - Assign users to crews
+  - Create and manage crews
+  - Access full dashboard with comprehensive filtering
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+- **Foreman Role:**
+  - Add new jobs for their assigned crew(s)
+  - View jobs for their crew(s) only
+  - Cannot see other crews' data
+  - Cannot manage users or crews
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+#### Dashboard Features
 
-## Clone and run locally
+- Clean table view of jobs
+- Quick filter buttons:
+  - This Week
+  - Last Week
+  - This Month
+  - All Jobs
+- Search functionality across all fields
+- Sortable columns (click to sort by any field)
+- Running totals:
+  - Total Yardage (for filtered view)
+  - Total Amount (for filtered view)
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+#### UX/Design Principles
 
-2. Create a Next.js app using the Supabase Starter template npx command
+- **Mobile-first design** - optimized for phones and tablets
+- **Large, touch-friendly buttons** - easy to use with work gloves
+- **Minimal text entry** - use dropdowns and auto-calculations where possible
+- **Clear visual feedback** - confirmation when jobs are added
+- **Simple, intuitive navigation** - construction workers aren't software experts
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+## Technical Decisions
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+### Tech Stack
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+- **Frontend:** Next.js 14+ (App Router)
+- **Backend/Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
 
-3. Use `cd` to change into the app's directory
+### Why This Stack?
 
-   ```bash
-   cd with-supabase-app
-   ```
+**Next.js**
 
-4. Rename `.env.example` to `.env.local` and update the following:
+- Server-side rendering for better performance
+- App Router for modern routing patterns
+- Built-in API routes if needed
+- Excellent developer experience
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+**Supabase**
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+- Built-in authentication (email/password, magic links, OAuth)
+- PostgreSQL database with real-time capabilities
+- Row Level Security (RLS) for secure data access
+- Auto-generated REST API
+- No backend code required
+- Free tier is generous for MVP
 
-5. You can now run the Next.js local development server:
+**Tailwind CSS**
 
-   ```bash
-   npm run dev
-   ```
+- Rapid UI development
+- Consistent design system
+- Mobile-first utilities
+- Already proven in prototype
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+**Vercel**
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+- One-click deployment
+- Automatic HTTPS
+- Edge network for fast performance
+- Free tier for small projects
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+### Database Schema
 
-## Feedback and issues
+```sql
+-- Profiles (extends Supabase auth.users)
+profiles:
+  - id (uuid, primary key, references auth.users)
+  - email (text)
+  - full_name (text)
+  - role (text: 'admin' | 'foreman')
+  - created_at (timestamp)
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+-- Crews
+crews:
+  - id (uuid, primary key)
+  - name (text)
+  - created_at (timestamp)
 
-## More Supabase examples
+-- Crew Members (junction table)
+crew_members:
+  - id (uuid, primary key)
+  - user_id (uuid, references profiles.id)
+  - crew_id (uuid, references crews.id)
+  - created_at (timestamp)
+  - UNIQUE constraint on (user_id, crew_id)
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+-- Jobs
+jobs:
+  - id (uuid, primary key)
+  - date (date, defaults to current date)
+  - job_name (text)
+  - elevation (text)
+  - lot_address (text)
+  - yardage (numeric)
+  - rate (numeric)
+  - total (numeric, computed: yardage * rate)
+  - crew_id (uuid, references crews.id)
+  - created_by (uuid, references profiles.id)
+  - notes (text, nullable)
+  - created_at (timestamp)
+```
+
+### Security Architecture
+
+**Row Level Security (RLS) Policies:**
+
+- Admins can view and manage all data
+- Foremen can only view/insert jobs for crews they're assigned to
+- Users can only read their own profile
+- All security enforced at database level (not just frontend)
+
+### Project Management Approach
+
+**For Iteration 1 (Solo Developer):**
+
+- Skip formal ticket tracking (Linear, Jira, etc.)
+- Use simple `todo.md` file in repository
+- Focus on rapid iteration and user feedback
+- Transition to Linear when:
+  - Adding additional developers
+  - Managing 10+ feature requests
+  - Juggling multiple projects
+  - Product is mature and in maintenance mode
+
+## Future Implementations
+
+### Iteration 2: Enhanced Reporting
+
+- **PDF/Excel Export** - export filtered job lists
+- **Crew Performance Analytics** - compare crews by productivity
+- **Date Range Reports** - custom date range filtering
+- **Job Status Tracking** - add status field (scheduled, in-progress, completed)
+- **Photo Uploads** - attach before/after photos to jobs
+
+### Iteration 3: Mobile App
+
+- **Native Mobile App** - React Native or Progressive Web App
+- **Offline Mode** - foremen can log jobs without internet, sync later
+- **GPS Integration** - auto-populate location/address
+- **Push Notifications** - remind foremen to log jobs at end of day
+
+### Iteration 4: Advanced Features
+
+- **Invoicing Integration** - generate invoices from job data
+- **Client Portal** - let clients view their job history
+- **Equipment Tracking** - track equipment usage per job
+- **Weather Integration** - log weather conditions for each job
+- **Time Tracking** - log start/end times, calculate labor hours
+- **Multi-tenant** - support multiple trade companies in one system
+
+### Iteration 5: Business Intelligence
+
+- **Predictive Analytics** - forecast crew capacity and revenue
+- **Cost Analysis** - track profitability by job type, crew, client
+- **Scheduling Optimization** - AI-powered crew scheduling
+- **Integration Hub** - connect to QuickBooks, scheduling software, etc.
+
+## Development Roadmap
+
+### Week 1: Foundation
+
+- Set up Next.js + Supabase project
+- Create database schema and RLS policies
+- Build authentication flow (login, logout, protected routes)
+- Set up project structure and base components
+
+### Week 2: Core Features
+
+- Port job tracker UI from prototype
+- Connect to Supabase (CRUD operations)
+- Implement role-based access control
+- Build admin panel (user/crew management)
+
+### Week 3: Testing & Deployment
+
+- Test with real users (your friend's foremen)
+- Fix bugs and gather feedback
+- Deploy to Vercel
+- Create user documentation
+
+### Week 4+: Iteration
+
+- Implement high-priority feedback items
+- Refine UX based on real-world usage
+- Plan Iteration 2 features
+
+## Success Metrics
+
+### MVP Success Criteria
+
+- [ ] Foremen can add a job in under 60 seconds
+- [ ] Admin can view weekly totals in under 10 seconds
+- [ ] Zero training required for foremen (intuitive enough to use immediately)
+- [ ] 100% of jobs logged digitally (replacing paper/spreadsheets)
+- [ ] Mobile responsive on phones and tablets
+
+### Long-term Goals
+
+- Reduce time spent on job tracking by 50%
+- Eliminate data entry errors from manual transcription
+- Enable real-time visibility into crew productivity
+- Scale to support 10+ crews without performance degradation
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- Supabase account (free tier)
+- Vercel account (free tier)
+- Git installed
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd trade-tracker
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Add your Supabase URL and anon key
+
+# Run development server
+npm run dev
+```
+
+### Environment Variables
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+## Contributing
+
+This is currently a solo project in MVP stage. Once we have validated the concept with real users, we'll open it up for contributions.
+
+## License
+
+Proprietary - All rights reserved
+
+## Contact
+
+For questions or feedback, contact [your contact info]
+
+---
+
+**Last Updated:** October 18, 2025  
+**Version:** 1.0.0 (MVP)  
+**Status:** In Development
