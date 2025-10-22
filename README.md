@@ -10,56 +10,56 @@ This application helps trade businesses track jobs completed by their crews. For
 
 ### Must Have (MVP - Iteration 1)
 
-#### Job Tracking
+#### Job Tracking ✅
 
-- **Job Fields:**
-  - Date (auto-populated on submission)
-  - Job name/number
-  - Elevation
-  - Lot/Address
-  - Yardage (numeric input)
-  - Rate (dollar amount)
-  - Total (auto-calculated: yardage × rate)
-  - Crew ID (auto-populated based on user's crew)
-  - Notes (optional)
+- **Job Fields:** ✅
+  - ~~Date (auto-populated on submission)~~
+  - ~~Job name/number~~
+  - ~~Elevation~~
+  - ~~Lot/Address~~
+  - ~~Yardage (numeric input)~~
+  - ~~Rate (dollar amount)~~
+  - ~~Total (auto-calculated: yardage × rate)~~
+  - ~~Crew ID (auto-populated based on user's crew)~~
+  - ~~Notes (optional)~~
 
-#### User Roles & Authentication
+#### User Roles & Authentication ✅
 
-- **Admin Role:**
+- **Admin Role:** ✅
 
-  - View all jobs across all crews
-  - Manage users (add, edit, remove)
-  - Assign users to crews
-  - Create and manage crews
-  - Access full dashboard with comprehensive filtering
+  - View all jobs across all crews (⏳ basic view done, filtering pending)
+  - ~~Manage users (add, edit, remove)~~
+  - ~~Assign users to crews~~
+  - ~~Create and manage crews~~
+  - ~~Access full dashboard~~ (filtering pending)
 
-- **Foreman Role:**
-  - Add new jobs for their assigned crew(s)
-  - View jobs for their crew(s) only
-  - Cannot see other crews' data
-  - Cannot manage users or crews
+- **Foreman Role:** ✅
+  - ~~Add new jobs for their assigned crew(s)~~
+  - View jobs for their crew(s) only (⏳ pending job list view)
+  - ~~Cannot see other crews' data~~
+  - ~~Cannot manage users or crews~~
 
-#### Dashboard Features
+#### Dashboard Features ⏳
 
-- Clean table view of jobs
-- Quick filter buttons:
+- Clean table view of jobs (⏳ pending)
+- Quick filter buttons: (⏳ pending)
   - This Week
   - Last Week
   - This Month
   - All Jobs
-- Search functionality across all fields
-- Sortable columns (click to sort by any field)
-- Running totals:
+- Search functionality across all fields (⏳ pending)
+- Sortable columns (click to sort by any field) (⏳ pending)
+- Running totals: (⏳ pending)
   - Total Yardage (for filtered view)
   - Total Amount (for filtered view)
 
-#### UX/Design Principles
+#### UX/Design Principles ✅
 
-- **Mobile-first design** - optimized for phones and tablets
-- **Large, touch-friendly buttons** - easy to use with work gloves
-- **Minimal text entry** - use dropdowns and auto-calculations where possible
-- **Clear visual feedback** - confirmation when jobs are added
-- **Simple, intuitive navigation** - construction workers aren't software experts
+- ~~**Mobile-first design** - optimized for phones and tablets~~
+- ~~**Large, touch-friendly buttons** - easy to use with work gloves~~
+- ~~**Minimal text entry** - use dropdowns and auto-calculations where possible~~
+- ~~**Clear visual feedback** - confirmation when jobs are added~~
+- ~~**Simple, intuitive navigation** - construction workers aren't software experts~~
 
 ## Technical Decisions
 
