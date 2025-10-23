@@ -6,15 +6,14 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { Users, Layers, BarChart3 } from "lucide-react";
+import { formatCurrency, formatNumber } from "@/lib/utils/date-helpers";
+import { JobStats } from "@/lib/types";
 
-type Profile = {
-  id: string;
-  full_name: string | null;
-  role: string;
-  crew_id: string | null;
-};
+interface AdminDashboardProps {
+  stats: JobStats;
+}
 
-export function AdminDashboard({ profile }: { profile: Profile }) {
+export function AdminDashboard({ stats }: AdminDashboardProps) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -30,6 +29,9 @@ export function AdminDashboard({ profile }: { profile: Profile }) {
               </Link>
               <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
                 Crews
+              </Link>
+              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
+                Jobs
               </Link>
             </div>
           </div>
@@ -54,9 +56,9 @@ export function AdminDashboard({ profile }: { profile: Profile }) {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">-</div>
+              <div className="text-2xl font-bold">{stats.totalJobs}</div>
               <p className="text-xs text-muted-foreground">
-                Coming soon with job list
+                All time
               </p>
             </CardContent>
           </Card>
@@ -69,7 +71,7 @@ export function AdminDashboard({ profile }: { profile: Profile }) {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">-</div>
+              <div className="text-2xl font-bold">{formatNumber(stats.totalYardage)}</div>
               <p className="text-xs text-muted-foreground">
                 Across all crews
               </p>
@@ -84,9 +86,9 @@ export function AdminDashboard({ profile }: { profile: Profile }) {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">-</div>
+              <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
               <p className="text-xs text-muted-foreground">
-                This month
+                All time
               </p>
             </CardContent>
           </Card>
@@ -131,15 +133,21 @@ export function AdminDashboard({ profile }: { profile: Profile }) {
           </Card>
         </div>
 
-        {/* Recent Jobs Section - Coming Soon */}
+        {/* Job Management Card */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Recent Jobs</CardTitle>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              <CardTitle>Job Management</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Job listing with filtering coming soon...
+              View, filter, and manage all jobs across all crews with powerful search and reporting tools
             </p>
+            <Button asChild className="w-full">
+              <Link href={ROUTES.ADMIN.JOBS}>View All Jobs</Link>
+            </Button>
           </CardContent>
         </Card>
       </main>

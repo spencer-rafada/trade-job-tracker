@@ -112,3 +112,17 @@ export async function isAdmin() {
   const profile = await getUserProfile(user.id);
   return profile?.role === "admin";
 }
+
+/**
+ * Require admin authentication
+ * Returns the admin profile if authenticated and authorized, null otherwise
+ */
+export async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const profile = await getUserProfile(user.id);
+  if (!profile || profile.role !== "admin") return null;
+
+  return profile;
+}

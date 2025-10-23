@@ -38,6 +38,9 @@ export default async function UsersPage() {
               <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
                 Crews
               </Link>
+              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
+                Jobs
+              </Link>
             </div>
           </div>
           <AuthButton />
