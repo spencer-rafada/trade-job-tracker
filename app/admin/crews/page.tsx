@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, getUserProfile } from "@/db/actions/user-actions";
 import { getAllCrews } from "@/db/actions/crew-actions";
+import { getAllTrades } from "@/db/actions/trade-actions";
 import { CrewManagement } from "@/components/crew-management";
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
@@ -18,8 +19,9 @@ export default async function CrewsPage() {
     redirect(ROUTES.HOME);
   }
 
-  // Fetch crews
+  // Fetch crews and trades
   const crews = await getAllCrews();
+  const trades = await getAllTrades();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,11 +39,13 @@ export default async function CrewsPage() {
               <Link href={ROUTES.ADMIN.CREWS} className="underline font-semibold">
                 Crews
               </Link>
+              <Link href={ROUTES.ADMIN.TRADES} className="hover:underline">
+                Trades
+              </Link>
               <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
               </Link>
-            </div>
-          </div>
+            </div>          </div>
           <AuthButton />
         </div>
       </nav>
@@ -55,7 +59,7 @@ export default async function CrewsPage() {
           </p>
         </div>
 
-        <CrewManagement crews={crews} />
+        <CrewManagement crews={crews} trades={trades} />
       </main>
 
       {/* Footer */}

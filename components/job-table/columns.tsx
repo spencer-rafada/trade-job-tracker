@@ -23,9 +23,19 @@ import {
 type Crew = {
   id: string;
   name: string;
+  trade_id: string | null;
+  trades: {
+    id: string;
+    trade_name: string;
+  } | null;
 };
 
-export const getColumns = (crews: Crew[]): ColumnDef<Job>[] => [
+type Trade = {
+  id: string;
+  trade_name: string;
+};
+
+export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] => [
   {
     accessorKey: "date",
     header: ({ column }) => {
@@ -166,6 +176,50 @@ export const getColumns = (crews: Crew[]): ColumnDef<Job>[] => [
       return row.getValue(id) === value;
     },
   },
+  ...(trades ? [{
+    accessorKey: "crews.trades.trade_name",
+    id: "trade",
+    header: ({ column }) => {
+      const filterValue = column.getFilterValue() as string | undefined;
+
+      return (
+        <div className="flex items-center gap-2">
+          <Select
+            value={filterValue || "all"}
+            onValueChange={(value) => {
+              column.setFilterValue(value === "all" ? undefined : value);
+            }}
+          >
+            <SelectTrigger className="h-8 w-[130px]">
+              <SelectValue placeholder="All Trades" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Trades</SelectItem>
+              {trades.map((trade) => (
+                <SelectItem key={trade.id} value={trade.trade_name}>
+                  {trade.trade_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <ArrowUpDown className="h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      return <div>{row.original.crews?.trades?.trade_name || "-"}</div>;
+    },
+    filterFn: (row, id, value) => {
+      return row.getValue(id) === value;
+    },
+  }] as ColumnDef<Job>[] : []),
   {
     accessorKey: "profiles.full_name",
     id: "created_by",

@@ -63,7 +63,11 @@ export async function getJobsByCrew(crewId: string, limit?: number) {
       *,
       crews (
         id,
-        name
+        name,
+        trades (
+          id,
+          trade_name
+        )
       ),
       profiles!jobs_created_by_fkey (
         id,
@@ -102,7 +106,11 @@ export async function getAllJobs(limit?: number) {
       *,
       crews (
         id,
-        name
+        name,
+        trades (
+          id,
+          trade_name
+        )
       ),
       profiles!jobs_created_by_fkey (
         id,
@@ -144,7 +152,11 @@ export async function getJobsByDateRange(
       *,
       crews (
         id,
-        name
+        name,
+        trades (
+          id,
+          trade_name
+        )
       ),
       profiles!jobs_created_by_fkey (
         id,

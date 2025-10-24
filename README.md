@@ -39,6 +39,12 @@ This application helps trade businesses track jobs completed by their crews. For
   - ~~Cannot see other crews' data~~
   - ~~Cannot manage users or crews~~
 
+- **Worker/Crew Member Role:** ⏳
+  - Report hours worked (date + hours)
+  - View their own hour submissions
+  - Cannot add jobs or manage users
+  - Cannot see other workers' data
+
 #### Dashboard Features ✅
 
 - ~~Clean table view of jobs~~ (Admin ✅, Foreman ⏳)
@@ -54,6 +60,34 @@ This application helps trade businesses track jobs completed by their crews. For
   - ~~Total Yardage (for filtered view)~~
   - ~~Total Amount (for filtered view)~~
 - ~~Crew filtering dropdown~~ (Admin ✅)
+
+#### Crew Management
+
+- **Trade/Department Field:** ⏳
+  - Add trade/department field to crews (e.g., "Concrete", "Framing", "Electrical")
+  - Filter jobs by trade in dashboard
+  - Helps organize crews by specialty
+
+#### Hours Tracking & Labor Compliance ⏳
+
+**Purpose:** Track individual worker hours for labor compliance and payroll reporting (separate from piece-rate job payments)
+
+**Worker Flow:**
+- Workers log into app with their own accounts
+- Report hours worked per day/week
+  - Date worked
+  - Total hours
+- View their own submitted hours
+
+**Admin Flow:**
+- View all unallocated worker hours
+- Tie/assign worker hours to specific jobs
+  - **TBD:** Can hours be split across multiple jobs in one day? (e.g., 4 hrs Job A + 4 hrs Job B)
+- Export hours data for payroll platform
+
+**Export/Integration:** (Future - defer for now)
+- Export worker hours tied to jobs in CSV/Excel format
+- Send to external payroll platform
 
 #### UX/Design Principles ✅
 
@@ -113,13 +147,14 @@ profiles:
   - id (uuid, primary key, references auth.users)
   - email (text)
   - full_name (text)
-  - role (text: 'admin' | 'foreman')
+  - role (text: 'admin' | 'foreman' | 'worker')
   - created_at (timestamp)
 
 -- Crews
 crews:
   - id (uuid, primary key)
   - name (text)
+  - trade (text, nullable) -- e.g., "Concrete", "Framing", "Electrical"
   - created_at (timestamp)
 
 -- Crew Members (junction table)
@@ -144,6 +179,24 @@ jobs:
   - created_by (uuid, references profiles.id)
   - notes (text, nullable)
   - created_at (timestamp)
+
+-- Hours (for labor compliance tracking)
+hours:
+  - id (uuid, primary key)
+  - worker_id (uuid, references profiles.id)
+  - date_worked (date)
+  - hours_worked (numeric)
+  - created_at (timestamp)
+  - status (text: 'unallocated' | 'allocated')
+
+-- Job Hours Allocation (ties worker hours to jobs)
+job_hours:
+  - id (uuid, primary key)
+  - hours_id (uuid, references hours.id)
+  - job_id (uuid, references jobs.id)
+  - allocated_hours (numeric) -- allows splitting hours across multiple jobs
+  - allocated_by (uuid, references profiles.id) -- admin who made allocation
+  - created_at (timestamp)
 ```
 
 ### Security Architecture
@@ -152,83 +205,21 @@ jobs:
 
 - Admins can view and manage all data
 - Foremen can only view/insert jobs for crews they're assigned to
+- Workers can only insert their own hours and view their own hour submissions
+- Workers cannot view jobs or manage users
 - Users can only read their own profile
 - All security enforced at database level (not just frontend)
 
-### Project Management Approach
+## Next Steps
 
-**For Iteration 1 (Solo Developer):**
+**Pending Decisions:**
+- Confirm if worker hours can be split across multiple jobs in one day
 
-- Skip formal ticket tracking (Linear, Jira, etc.)
-- Use simple `todo.md` file in repository
-- Focus on rapid iteration and user feedback
-- Transition to Linear when:
-  - Adding additional developers
-  - Managing 10+ feature requests
-  - Juggling multiple projects
-  - Product is mature and in maintenance mode
-
-## Future Implementations
-
-### Iteration 2: Enhanced Reporting
-
-- **PDF/Excel Export** - export filtered job lists
-- **Crew Performance Analytics** - compare crews by productivity
-- **Date Range Reports** - custom date range filtering
-- **Job Status Tracking** - add status field (scheduled, in-progress, completed)
-- **Photo Uploads** - attach before/after photos to jobs
-
-### Iteration 3: Mobile App
-
-- **Native Mobile App** - React Native or Progressive Web App
-- **Offline Mode** - foremen can log jobs without internet, sync later
-- **GPS Integration** - auto-populate location/address
-- **Push Notifications** - remind foremen to log jobs at end of day
-
-### Iteration 4: Advanced Features
-
-- **Invoicing Integration** - generate invoices from job data
-- **Client Portal** - let clients view their job history
-- **Equipment Tracking** - track equipment usage per job
-- **Weather Integration** - log weather conditions for each job
-- **Time Tracking** - log start/end times, calculate labor hours
-- **Multi-tenant** - support multiple trade companies in one system
-
-### Iteration 5: Business Intelligence
-
-- **Predictive Analytics** - forecast crew capacity and revenue
-- **Cost Analysis** - track profitability by job type, crew, client
-- **Scheduling Optimization** - AI-powered crew scheduling
-- **Integration Hub** - connect to QuickBooks, scheduling software, etc.
-
-## Development Roadmap
-
-### Week 1: Foundation
-
-- Set up Next.js + Supabase project
-- Create database schema and RLS policies
-- Build authentication flow (login, logout, protected routes)
-- Set up project structure and base components
-
-### Week 2: Core Features
-
-- Port job tracker UI from prototype
-- Connect to Supabase (CRUD operations)
-- Implement role-based access control
-- Build admin panel (user/crew management)
-
-### Week 3: Testing & Deployment
-
-- Test with real users (your friend's foremen)
-- Fix bugs and gather feedback
-- Deploy to Vercel
-- Create user documentation
-
-### Week 4+: Iteration
-
-- Implement high-priority feedback items
-- Refine UX based on real-world usage
-- Plan Iteration 2 features
+**Upcoming Features:**
+- Hours tracking & labor compliance
+- Trade/department filtering for crews
+- Foreman job list view
+- Hours export to payroll platform
 
 ## Success Metrics
 

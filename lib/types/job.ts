@@ -19,6 +19,10 @@ export type Job = {
   crews: {
     id: string;
     name: string;
+    trades: {
+      id: string;
+      trade_name: string;
+    } | null;
   } | null;
   profiles: {
     id: string;
