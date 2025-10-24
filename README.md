@@ -27,11 +27,11 @@ This application helps trade businesses track jobs completed by their crews. For
 
 - **Admin Role:** ✅
 
-  - View all jobs across all crews (⏳ basic view done, filtering pending)
+  - ~~View all jobs across all crews with filtering~~
   - ~~Manage users (add, edit, remove)~~
   - ~~Assign users to crews~~
   - ~~Create and manage crews~~
-  - ~~Access full dashboard~~ (filtering pending)
+  - ~~Access full dashboard with stats~~
 
 - **Foreman Role:** ✅
   - ~~Add new jobs for their assigned crew(s)~~
@@ -39,19 +39,21 @@ This application helps trade businesses track jobs completed by their crews. For
   - ~~Cannot see other crews' data~~
   - ~~Cannot manage users or crews~~
 
-#### Dashboard Features ⏳
+#### Dashboard Features ✅
 
-- Clean table view of jobs (⏳ pending)
-- Quick filter buttons: (⏳ pending)
-  - This Week
-  - Last Week
-  - This Month
-  - All Jobs
-- Search functionality across all fields (⏳ pending)
-- Sortable columns (click to sort by any field) (⏳ pending)
-- Running totals: (⏳ pending)
-  - Total Yardage (for filtered view)
-  - Total Amount (for filtered view)
+- ~~Clean table view of jobs~~ (Admin ✅, Foreman ⏳)
+- ~~Quick filter buttons:~~ (Admin ✅, Foreman ⏳)
+  - ~~This Week~~
+  - ~~Last Week~~
+  - ~~This Month~~
+  - ~~All Jobs~~
+- ~~Search functionality across all fields~~ (Admin ✅, Foreman ⏳)
+- ~~Sortable columns (click to sort by any field)~~ (Admin ✅, Foreman ⏳)
+- ~~Running totals:~~ (Admin ✅, Foreman ⏳)
+  - ~~Total Jobs (for filtered view)~~
+  - ~~Total Yardage (for filtered view)~~
+  - ~~Total Amount (for filtered view)~~
+- ~~Crew filtering dropdown~~ (Admin ✅)
 
 #### UX/Design Principles ✅
 
