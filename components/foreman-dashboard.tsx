@@ -77,7 +77,7 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                You haven't been assigned to a crew yet. Please contact your
+                You haven&apos;t been assigned to a crew yet. Please contact your
                 administrator to get assigned to a crew.
               </p>
             </CardContent>
