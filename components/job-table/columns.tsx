@@ -221,11 +221,14 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
     },
   }] as ColumnDef<Job>[] : []),
   {
-    accessorKey: "profiles.full_name",
     id: "created_by",
     header: "Created By",
     cell: ({ row }) => {
-      return <div>{row.original.profiles?.full_name || row.original.profiles?.email || "Unknown"}</div>;
+      const profile = row.original.profiles;
+      const name = profile?.first_name && profile?.last_name
+        ? `${profile.first_name} ${profile.last_name}`
+        : profile?.email || "Unknown";
+      return <div>{name}</div>;
     },
   },
   {

@@ -142,7 +142,8 @@ export async function getAllHours(startDate?: string, endDate?: string) {
       *,
       profiles!hours_worker_id_fkey (
         id,
-        full_name,
+        first_name,
+        last_name,
         email,
         hourly_rate,
         crew_id,
@@ -181,7 +182,7 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
   // Get all crew members
   const { data: crewMembers, error: crewError } = await supabase
     .from("profiles")
-    .select("id, full_name, hourly_rate")
+    .select("id, first_name, last_name, hourly_rate")
     .eq("crew_id", crewId);
 
   if (crewError) {
@@ -198,7 +199,8 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
       *,
       profiles!hours_worker_id_fkey (
         id,
-        full_name,
+        first_name,
+        last_name,
         hourly_rate
       )
     `)
@@ -233,7 +235,9 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
     if (!acc[workerId]) {
       acc[workerId] = {
         worker_id: workerId,
-        full_name: hour.profiles?.full_name || "Unknown",
+        full_name: hour.profiles?.first_name && hour.profiles?.last_name
+          ? `${hour.profiles.first_name} ${hour.profiles.last_name}`
+          : "Unknown",
         hourly_rate: hour.profiles?.hourly_rate || 0,
         total_hours: 0,
         minimum_required_pay: 0,

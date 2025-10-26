@@ -11,7 +11,8 @@ export type Hours = {
 export type HoursWithWorker = Hours & {
   profiles: {
     id: string;
-    full_name: string | null;
+    first_name: string;
+    last_name: string;
     email: string;
     hourly_rate: number | null;
     crew_id: string | null;

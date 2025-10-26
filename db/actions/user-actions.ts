@@ -2,6 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type {
+  Profile,
+  ProfileWithCrew,
+  AdminProfileUpdateInput,
+} from "@/lib/types";
 
 /**
  * Get the current authenticated user
@@ -23,7 +28,9 @@ export async function getCurrentUser() {
 /**
  * Get user profile with crew information
  */
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(
+  userId: string
+): Promise<ProfileWithCrew | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -43,13 +50,13 @@ export async function getUserProfile(userId: string) {
     return null;
   }
 
-  return data;
+  return data as ProfileWithCrew;
 }
 
 /**
  * Get all users (admin only)
  */
-export async function getAllUsers() {
+export async function getAllUsers(): Promise<ProfileWithCrew[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -68,7 +75,7 @@ export async function getAllUsers() {
     return [];
   }
 
-  return data;
+  return data as ProfileWithCrew[];
 }
 
 /**
@@ -76,18 +83,16 @@ export async function getAllUsers() {
  */
 export async function updateUserProfile(
   userId: string,
-  updates: {
-    full_name?: string;
-    role?: "admin" | "foreman" | "worker";
-    crew_id?: string | null;
-    hourly_rate?: number | null;
-  }
+  updates: AdminProfileUpdateInput
 ) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("profiles")
-    .update(updates)
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", userId)
     .select()
     .single();
