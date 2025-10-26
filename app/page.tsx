@@ -4,6 +4,7 @@ import { getCurrentUser, getUserProfile } from "@/db/actions/user-actions";
 import { getJobStats } from "@/db/actions/job-actions";
 import { ForemanDashboard } from "@/components/foreman-dashboard";
 import { AdminDashboard } from "@/components/admin-dashboard";
+import { WorkerDashboard } from "@/components/worker-dashboard";
 
 export default async function DashboardPage() {
   // Check authentication
@@ -31,5 +32,10 @@ export default async function DashboardPage() {
     return <AdminDashboard stats={stats} />;
   }
 
-  return <ForemanDashboard profile={profile} />;
+  if (profile.role === "foreman") {
+    return <ForemanDashboard profile={profile} />;
+  }
+
+  // Default to worker dashboard
+  return <WorkerDashboard profile={profile} />;
 }

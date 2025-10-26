@@ -1,25 +1,15 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser, getUserProfile, getAllUsers } from "@/db/actions/user-actions";
+import { requireAdmin } from "@/db/actions/user-actions";
 import { getAllCrews } from "@/db/actions/crew-actions";
-import { UserManagement } from "@/components/user-management";
-import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
+import { AuthButton } from "@/components/auth-button";
+import { WeeklyHoursSummary } from "@/components/weekly-hours-summary";
 import Link from "next/link";
 
-export default async function UsersPage() {
-  // Check authentication and authorization
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect(ROUTES.AUTH.LOGIN);
-  }
+export default async function AdminHoursPage() {
+  const profile = await requireAdmin();
+  if (!profile) redirect(ROUTES.AUTH.LOGIN);
 
-  const profile = await getUserProfile(user.id);
-  if (!profile || profile.role !== "admin") {
-    redirect(ROUTES.HOME);
-  }
-
-  // Fetch users and crews
-  const users = await getAllUsers();
   const crews = await getAllCrews();
 
   return (
@@ -32,7 +22,7 @@ export default async function UsersPage() {
               Trade Job Tracker
             </Link>
             <div className="flex gap-4 text-sm">
-              <Link href={ROUTES.ADMIN.USERS} className="underline font-semibold">
+              <Link href={ROUTES.ADMIN.USERS} className="hover:underline">
                 Users
               </Link>
               <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
@@ -44,7 +34,7 @@ export default async function UsersPage() {
               <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
               </Link>
-              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
+              <Link href={ROUTES.ADMIN.HOURS} className="underline font-semibold">
                 Hours
               </Link>
             </div>
@@ -56,13 +46,13 @@ export default async function UsersPage() {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">User Management</h1>
+          <h1 className="text-3xl font-bold mb-2">Hours Management</h1>
           <p className="text-muted-foreground">
-            Manage foremen and assign them to crews
+            View weekly crew hours and compliance status
           </p>
         </div>
 
-        <UserManagement users={users} crews={crews} />
+        <WeeklyHoursSummary crews={crews} />
       </main>
 
       {/* Footer */}

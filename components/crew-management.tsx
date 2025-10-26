@@ -5,29 +5,55 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createCrew, updateCrew, deleteCrew } from "@/db/actions/crew-actions";
+
+type Trade = {
+  id: string;
+  trade_name: string;
+};
 
 type Crew = {
   id: string;
   name: string;
+  trade_id: string | null;
   created_at: string;
+  trades: Trade | null;
 };
 
-export function CrewManagement({ crews }: { crews: Crew[] }) {
+interface CrewManagementProps {
+  crews: Crew[];
+  trades: Trade[];
+}
+
+export function CrewManagement({ crews, trades }: CrewManagementProps) {
   const [editingCrewId, setEditingCrewId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [selectedTradeId, setSelectedTradeId] = useState<string>("none");
+  const [editTradeId, setEditTradeId] = useState<string>("none");
 
   const handleCreate = async (formData: FormData) => {
     setSaving(true);
     const name = formData.get("name") as string;
 
-    const result = await createCrew(name);
+    const result = await createCrew(
+      name,
+      selectedTradeId && selectedTradeId !== "none" ? selectedTradeId : undefined
+    );
 
     setSaving(false);
 
     if (result.success) {
       setCreating(false);
+      setSelectedTradeId("none");
     } else {
       alert(`Error: ${result.error}`);
     }
@@ -37,12 +63,17 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
     setSaving(true);
     const name = formData.get("name") as string;
 
-    const result = await updateCrew(crewId, name);
+    const result = await updateCrew(
+      crewId,
+      name,
+      editTradeId && editTradeId !== "none" ? editTradeId : null
+    );
 
     setSaving(false);
 
     if (result.success) {
       setEditingCrewId(null);
+      setEditTradeId("none");
     } else {
       alert(`Error: ${result.error}`);
     }
@@ -77,7 +108,7 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
               className="space-y-4"
             >
               <div className="space-y-2">
-                <Label htmlFor="name">Crew Name</Label>
+                <Label htmlFor="name">Crew Name *</Label>
                 <Input
                   id="name"
                   name="name"
@@ -87,6 +118,23 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="trade">Trade/Department</Label>
+                <Select value={selectedTradeId || "none"} onValueChange={setSelectedTradeId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a trade (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    {trades.filter(trade => trade.id && trade.id !== "").map((trade) => (
+                      <SelectItem key={trade.id} value={trade.id}>
+                        {trade.trade_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="flex gap-2">
                 <Button type="submit" disabled={saving}>
                   {saving ? "Creating..." : "Create Crew"}
@@ -94,7 +142,10 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setCreating(false)}
+                  onClick={() => {
+                    setCreating(false);
+                    setSelectedTradeId("none");
+                  }}
                   disabled={saving}
                 >
                   Cancel
@@ -135,15 +186,36 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                           e.preventDefault();
                           handleUpdate(crew.id, new FormData(e.currentTarget));
                         }}
-                        className="flex-1 flex items-center gap-4"
+                        className="flex-1 space-y-4"
                       >
-                        <div className="flex-1">
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-name-${crew.id}`}>Crew Name *</Label>
                           <Input
+                            id={`edit-name-${crew.id}`}
                             name="name"
                             type="text"
                             defaultValue={crew.name}
                             required
                           />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`edit-trade-${crew.id}`}>Trade/Department</Label>
+                          <Select
+                            value={editTradeId || "none"}
+                            onValueChange={setEditTradeId}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a trade (optional)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">None</SelectItem>
+                              {trades.filter(trade => trade.id && trade.id !== "").map((trade) => (
+                                <SelectItem key={trade.id} value={trade.id}>
+                                  {trade.trade_name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2">
                           <Button type="submit" size="sm" disabled={saving}>
@@ -153,7 +225,10 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => setEditingCrewId(null)}
+                            onClick={() => {
+                              setEditingCrewId(null);
+                              setEditTradeId("none");
+                            }}
                             disabled={saving}
                           >
                             Cancel
@@ -162,9 +237,14 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                       </form>
                     ) : (
                       <>
-                        <div>
-                          <h3 className="font-semibold">{crew.name}</h3>
-                          <p className="text-sm text-muted-foreground">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold text-lg">{crew.name}</h3>
+                            {crew.trades && (
+                              <Badge variant="secondary">{crew.trades.trade_name}</Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
                             Created {new Date(crew.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -172,7 +252,10 @@ export function CrewManagement({ crews }: { crews: Crew[] }) {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setEditingCrewId(crew.id)}
+                            onClick={() => {
+                              setEditingCrewId(crew.id);
+                              setEditTradeId(crew.trade_id && crew.trade_id !== "" ? crew.trade_id : "none");
+                            }}
                           >
                             Edit
                           </Button>

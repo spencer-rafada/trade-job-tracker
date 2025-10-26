@@ -19,11 +19,22 @@ import { BarChart3, DollarSign, Package } from "lucide-react";
 type Crew = {
   id: string;
   name: string;
+  trade_id: string | null;
+  trades: {
+    id: string;
+    trade_name: string;
+  } | null;
+};
+
+type Trade = {
+  id: string;
+  trade_name: string;
 };
 
 interface JobsPageClientProps {
   jobs: Job[];
   crews: Crew[];
+  trades: Trade[];
   profile: {
     id: string;
     full_name: string | null;
@@ -31,7 +42,7 @@ interface JobsPageClientProps {
   };
 }
 
-export function JobsPageClient({ jobs, crews }: JobsPageClientProps) {
+export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
   const [searchValue, setSearchValue] = React.useState("");
   const [activeFilter, setActiveFilter] = React.useState<FilterPreset>("all");
 
@@ -101,8 +112,14 @@ export function JobsPageClient({ jobs, crews }: JobsPageClientProps) {
               <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
                 Crews
               </Link>
+              <Link href={ROUTES.ADMIN.TRADES} className="hover:underline">
+                Trades
+              </Link>
               <Link href={ROUTES.ADMIN.JOBS} className="underline font-semibold">
                 Jobs
+              </Link>
+              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
+                Hours
               </Link>
             </div>
           </div>
@@ -173,7 +190,7 @@ export function JobsPageClient({ jobs, crews }: JobsPageClientProps) {
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
             />
-            <JobTable columns={getColumns(crews)} data={filteredJobs} />
+            <JobTable columns={getColumns(crews, trades)} data={filteredJobs} />
           </CardContent>
         </Card>
       </main>

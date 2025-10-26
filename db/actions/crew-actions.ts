@@ -4,14 +4,20 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 /**
- * Get all crews
+ * Get all crews with their trade information
  */
 export async function getAllCrews() {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("crews")
-    .select("*")
+    .select(`
+      *,
+      trades (
+        id,
+        trade_name
+      )
+    `)
     .order("name", { ascending: true });
 
   if (error) {
@@ -45,12 +51,12 @@ export async function getCrewById(crewId: string) {
 /**
  * Create a new crew (admin only)
  */
-export async function createCrew(name: string) {
+export async function createCrew(name: string, trade_id?: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error} = await supabase
     .from("crews")
-    .insert({ name })
+    .insert({ name, trade_id: trade_id || null })
     .select()
     .single();
 
@@ -60,6 +66,7 @@ export async function createCrew(name: string) {
   }
 
   revalidatePath("/admin/crews");
+  revalidatePath("/admin/jobs");
   revalidatePath("/");
 
   return { success: true, data };
@@ -68,12 +75,12 @@ export async function createCrew(name: string) {
 /**
  * Update crew (admin only)
  */
-export async function updateCrew(crewId: string, name: string) {
+export async function updateCrew(crewId: string, name: string, trade_id?: string | null) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("crews")
-    .update({ name })
+    .update({ name, trade_id: trade_id !== undefined ? trade_id : undefined })
     .eq("id", crewId)
     .select()
     .single();
@@ -84,6 +91,7 @@ export async function updateCrew(crewId: string, name: string) {
   }
 
   revalidatePath("/admin/crews");
+  revalidatePath("/admin/jobs");
   revalidatePath("/");
 
   return { success: true, data };
