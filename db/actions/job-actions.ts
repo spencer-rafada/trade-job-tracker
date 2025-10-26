@@ -71,7 +71,8 @@ export async function getJobsByCrew(crewId: string, limit?: number) {
       ),
       profiles!jobs_created_by_fkey (
         id,
-        full_name,
+        first_name,
+        last_name,
         email
       )
     `
@@ -114,7 +115,8 @@ export async function getAllJobs(limit?: number) {
       ),
       profiles!jobs_created_by_fkey (
         id,
-        full_name,
+        first_name,
+        last_name,
         email
       )
     `
@@ -160,7 +162,8 @@ export async function getJobsByDateRange(
       ),
       profiles!jobs_created_by_fkey (
         id,
-        full_name,
+        first_name,
+        last_name,
         email
       )
     `

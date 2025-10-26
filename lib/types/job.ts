@@ -26,7 +26,8 @@ export type Job = {
   } | null;
   profiles: {
     id: string;
-    full_name: string | null;
+    first_name: string;
+    last_name: string;
     email: string;
   } | null;
 };
