@@ -39,11 +39,11 @@ This application helps trade businesses track jobs completed by their crews. For
   - ~~Cannot see other crews' data~~
   - ~~Cannot manage users or crews~~
 
-- **Worker/Crew Member Role:** ⏳
-  - Report hours worked (date + hours)
-  - View their own hour submissions
-  - Cannot add jobs or manage users
-  - Cannot see other workers' data
+- **Worker/Crew Member Role:** ✅
+  - ~~Report hours worked (date + hours)~~
+  - ~~View their own hour submissions~~
+  - ~~Cannot add jobs or manage users~~
+  - ~~Cannot see other workers' data~~
 
 #### Dashboard Features ✅
 
@@ -68,26 +68,32 @@ This application helps trade businesses track jobs completed by their crews. For
   - Filter jobs by trade in dashboard
   - Helps organize crews by specialty
 
-#### Hours Tracking & Labor Compliance ⏳
+#### Hours Tracking & Labor Compliance ✅
 
-**Purpose:** Track individual worker hours for labor compliance and payroll reporting (separate from piece-rate job payments)
+**Purpose:** Track worker hours and ensure piece-rate earnings meet minimum wage requirements
 
-**Worker Flow:**
-- Workers log into app with their own accounts
-- Report hours worked per day/week
-  - Date worked
-  - Total hours
-- View their own submitted hours
+**Implementation:** Piece-rate workers are paid primarily by job completion, but must earn at least their hourly rate for total hours worked. The system validates weekly compliance.
 
-**Admin Flow:**
-- View all unallocated worker hours
-- Tie/assign worker hours to specific jobs
-  - **TBD:** Can hours be split across multiple jobs in one day? (e.g., 4 hrs Job A + 4 hrs Job B)
-- Export hours data for payroll platform
+**Worker/Foreman Flow:** ✅
+- ~~Workers and foremen submit daily hours~~
+  - ~~Date worked~~
+  - ~~Total hours~~
+  - ~~Optional notes~~
+- ~~View and edit their own hour submissions (last 30 days)~~
+- ~~See their hourly rate~~
 
-**Export/Integration:** (Future - defer for now)
-- Export worker hours tied to jobs in CSV/Excel format
-- Send to external payroll platform
+**Admin Flow:** ✅
+- ~~View weekly crew summaries for labor compliance~~
+- ~~Select crew and week to analyze~~
+- ~~See total job earnings vs. minimum required pay~~
+- ~~Compliance status: ✅ Compliant or ⚠️ Below Minimum~~
+- ~~Bonus pool calculation (earnings above minimum)~~
+- ~~Individual worker breakdowns (hours × hourly rate)~~
+
+**Future Enhancements:** ⏳
+- Export hours data to CSV/Excel for payroll
+- Historical compliance reports
+- Email notifications for missing hour submissions
 
 #### UX/Design Principles ✅
 
@@ -148,6 +154,8 @@ profiles:
   - email (text)
   - full_name (text)
   - role (text: 'admin' | 'foreman' | 'worker')
+  - hourly_rate (numeric, nullable) -- for minimum wage compliance
+  - crew_id (uuid, references crews.id, nullable)
   - created_at (timestamp)
 
 -- Crews
@@ -156,14 +164,6 @@ crews:
   - name (text)
   - trade (text, nullable) -- e.g., "Concrete", "Framing", "Electrical"
   - created_at (timestamp)
-
--- Crew Members (junction table)
-crew_members:
-  - id (uuid, primary key)
-  - user_id (uuid, references profiles.id)
-  - crew_id (uuid, references crews.id)
-  - created_at (timestamp)
-  - UNIQUE constraint on (user_id, crew_id)
 
 -- Jobs
 jobs:
@@ -185,41 +185,33 @@ hours:
   - id (uuid, primary key)
   - worker_id (uuid, references profiles.id)
   - date_worked (date)
-  - hours_worked (numeric)
+  - hours_worked (numeric, must be > 0)
+  - notes (text, nullable)
   - created_at (timestamp)
-  - status (text: 'unallocated' | 'allocated')
-
--- Job Hours Allocation (ties worker hours to jobs)
-job_hours:
-  - id (uuid, primary key)
-  - hours_id (uuid, references hours.id)
-  - job_id (uuid, references jobs.id)
-  - allocated_hours (numeric) -- allows splitting hours across multiple jobs
-  - allocated_by (uuid, references profiles.id) -- admin who made allocation
-  - created_at (timestamp)
+  - updated_at (timestamp)
 ```
 
 ### Security Architecture
 
 **Row Level Security (RLS) Policies:**
 
-- Admins can view and manage all data
-- Foremen can only view/insert jobs for crews they're assigned to
-- Workers can only insert their own hours and view their own hour submissions
+- Admins can view and manage all data (jobs, hours, users, crews)
+- Foremen can only view/insert jobs for their assigned crew
+- Foremen can view hours for their crew members
+- Workers and foremen can insert/update/delete their own hours
+- Workers can view their own hour submissions only
 - Workers cannot view jobs or manage users
 - Users can only read their own profile
 - All security enforced at database level (not just frontend)
 
 ## Next Steps
 
-**Pending Decisions:**
-- Confirm if worker hours can be split across multiple jobs in one day
-
 **Upcoming Features:**
-- Hours tracking & labor compliance
-- Trade/department filtering for crews
+- Trade/department filtering for crews (partially implemented)
 - Foreman job list view
-- Hours export to payroll platform
+- Hours export to CSV/Excel for payroll
+- Historical compliance reports
+- Email notifications for missing hour submissions
 
 ## Success Metrics
 
