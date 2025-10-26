@@ -1,25 +1,26 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, getUserProfile } from "@/db/actions/user-actions";
-import { getAllTrades } from "@/db/actions/trade-actions";
-import { TradeManagement } from "@/components/trade-management";
+import { getMyHours } from "@/db/actions/hours-actions";
+import { HoursSubmission } from "@/components/hours-submission";
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 
-export default async function TradesPage() {
-  // Check authentication and authorization
+export default async function WorkerHoursPage() {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect(ROUTES.AUTH.LOGIN);
-  }
+  if (!user) redirect(ROUTES.AUTH.LOGIN);
 
   const profile = await getUserProfile(user.id);
-  if (!profile || profile.role !== "admin") {
+  if (!profile || profile.role === 'admin') {
     redirect(ROUTES.HOME);
   }
 
-  // Fetch trades
-  const trades = await getAllTrades();
+  // Get recent hours (last 30 days)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+
+  const hours = await getMyHours(startDate);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -31,20 +32,8 @@ export default async function TradesPage() {
               Trade Job Tracker
             </Link>
             <div className="flex gap-4 text-sm">
-              <Link href={ROUTES.ADMIN.USERS} className="hover:underline">
-                Users
-              </Link>
-              <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
-                Crews
-              </Link>
-              <Link href={ROUTES.ADMIN.TRADES} className="underline font-semibold">
-                Trades
-              </Link>
-              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
-                Jobs
-              </Link>
-              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
-                Hours
+              <Link href={ROUTES.WORKER.HOURS} className="underline font-semibold">
+                My Hours
               </Link>
             </div>
           </div>
@@ -55,13 +44,16 @@ export default async function TradesPage() {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-5xl mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Trade Management</h1>
+          <h1 className="text-3xl font-bold mb-2">My Hours</h1>
           <p className="text-muted-foreground">
-            Create and manage trade types and departments
+            Submit your daily hours worked for payroll tracking
           </p>
         </div>
 
-        <TradeManagement trades={trades} />
+        <HoursSubmission
+          recentHours={hours}
+          hourlyRate={profile.hourly_rate}
+        />
       </main>
 
       {/* Footer */}

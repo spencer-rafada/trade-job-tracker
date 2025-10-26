@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import { Users, Layers, BarChart3, Briefcase } from "lucide-react";
+import { Users, Layers, BarChart3, Briefcase, Clock } from "lucide-react";
 import { formatCurrency, formatNumber } from "@/lib/utils/date-helpers";
 import { JobStats } from "@/lib/types";
 
@@ -35,6 +35,9 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               </Link>
               <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
+              </Link>
+              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
+                Hours
               </Link>
             </div>
           </div>
@@ -168,6 +171,24 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
             </p>
             <Button asChild className="w-full">
               <Link href={ROUTES.ADMIN.JOBS}>View All Jobs</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Hours Management Card */}
+        <Card className="mt-8">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              <CardTitle>Hours Management</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Track worker hours, view weekly summaries, and ensure labor compliance with minimum wage requirements
+            </p>
+            <Button asChild className="w-full">
+              <Link href={ROUTES.ADMIN.HOURS}>Manage Hours</Link>
             </Button>
           </CardContent>
         </Card>

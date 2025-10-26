@@ -24,8 +24,14 @@ export const ROUTES = {
     CREWS: "/admin/crews",
     TRADES: "/admin/trades",
     JOBS: "/admin/jobs",
+    HOURS: "/admin/hours",
+  },
+
+  // Worker routes
+  WORKER: {
+    HOURS: "/worker/hours",
   },
 } as const;
 
 // Type for route values
-export type Route = typeof ROUTES[keyof typeof ROUTES] | typeof ROUTES.AUTH[keyof typeof ROUTES.AUTH] | typeof ROUTES.ADMIN[keyof typeof ROUTES.ADMIN];
+export type Route = typeof ROUTES[keyof typeof ROUTES] | typeof ROUTES.AUTH[keyof typeof ROUTES.AUTH] | typeof ROUTES.ADMIN[keyof typeof ROUTES.ADMIN] | typeof ROUTES.WORKER[keyof typeof ROUTES.WORKER];

@@ -12,6 +12,7 @@ type User = {
   full_name: string | null;
   role: string;
   crew_id: string | null;
+  hourly_rate: number | null;
   crews: {
     id: string;
     name: string;
@@ -31,9 +32,12 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
   const handleSave = async (userId: string, formData: FormData) => {
     setSaving(true);
 
+    const hourlyRateValue = formData.get("hourly_rate") as string;
+
     const updates = {
       crew_id: formData.get("crew_id") as string || null,
-      role: formData.get("role") as "admin" | "foreman",
+      role: formData.get("role") as "admin" | "foreman" | "worker",
+      hourly_rate: hourlyRateValue ? parseFloat(hourlyRateValue) : null,
     };
 
     const result = await updateUserProfile(userId, updates);
@@ -57,6 +61,7 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                 <th className="text-left p-4 font-medium">Email</th>
                 <th className="text-left p-4 font-medium">Role</th>
                 <th className="text-left p-4 font-medium">Crew</th>
+                <th className="text-left p-4 font-medium">Hourly Rate</th>
                 <th className="text-left p-4 font-medium">Actions</th>
               </tr>
             </thead>
@@ -68,7 +73,7 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                   <tr key={user.id} className="border-b last:border-0">
                     {isEditing ? (
                       // Edit Mode
-                      <td colSpan={5} className="p-4">
+                      <td colSpan={6} className="p-4">
                         <form
                           onSubmit={(e) => {
                             e.preventDefault();
@@ -91,6 +96,7 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                               defaultValue={user.role}
                               className="w-full px-3 py-2 border rounded-md"
                             >
+                              <option value="worker">Worker</option>
                               <option value="foreman">Foreman</option>
                               <option value="admin">Admin</option>
                             </select>
@@ -112,6 +118,21 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                                 </option>
                               ))}
                             </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              Hourly Rate ($/hr)
+                            </label>
+                            <input
+                              name="hourly_rate"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              defaultValue={user.hourly_rate || ""}
+                              placeholder="20.00"
+                              className="w-full px-3 py-2 border rounded-md"
+                            />
                           </div>
 
                           <div className="flex gap-2">
@@ -149,6 +170,13 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                           )}
                         </td>
                         <td className="p-4">
+                          {user.hourly_rate ? (
+                            <span className="text-sm">${user.hourly_rate.toFixed(2)}/hr</span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">Not set</span>
+                          )}
+                        </td>
+                        <td className="p-4">
                           <Button
                             variant="outline"
                             size="sm"
@@ -165,7 +193,7 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
 
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground">
                     No users found. Users will appear here after they sign up.
                   </td>
                 </tr>

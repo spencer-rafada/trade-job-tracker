@@ -78,8 +78,9 @@ export async function updateUserProfile(
   userId: string,
   updates: {
     full_name?: string;
-    role?: "admin" | "foreman";
+    role?: "admin" | "foreman" | "worker";
     crew_id?: string | null;
+    hourly_rate?: number | null;
   }
 ) {
   const supabase = await createClient();

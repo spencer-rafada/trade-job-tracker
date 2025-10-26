@@ -45,6 +45,9 @@ export default async function CrewsPage() {
               <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
               </Link>
+              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
+                Hours
+              </Link>
             </div>          </div>
           <AuthButton />
         </div>

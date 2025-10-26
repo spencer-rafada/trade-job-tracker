@@ -9,6 +9,7 @@ import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { createJob, type JobFormData } from "@/db/actions/job-actions";
+import { Clock } from "lucide-react";
 
 type Profile = {
   id: string;
@@ -228,6 +229,24 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
                 {loading ? "Adding Job..." : "Add Job"}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* My Hours Card */}
+        <Card className="mt-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              <CardTitle>My Hours</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Submit and track your daily hours worked for payroll and compliance.
+            </p>
+            <Button asChild variant="outline" className="w-full">
+              <Link href={ROUTES.WORKER.HOURS}>Manage My Hours</Link>
+            </Button>
           </CardContent>
         </Card>
       </main>

@@ -118,6 +118,9 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
               <Link href={ROUTES.ADMIN.JOBS} className="underline font-semibold">
                 Jobs
               </Link>
+              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
+                Hours
+              </Link>
             </div>
           </div>
           <AuthButton />
