@@ -9,7 +9,9 @@ import { updateUserProfile } from "@/db/actions/user-actions";
 type User = {
   id: string;
   email: string;
-  full_name: string | null;
+  first_name: string;
+  last_name: string;
+  phone_number: string | null;
   role: string;
   crew_id: string | null;
   hourly_rate: number | null;
@@ -154,7 +156,9 @@ export function UserManagement({ users, crews }: { users: User[]; crews: Crew[] 
                       // View Mode
                       <>
                         <td className="p-4">
-                          {user.full_name || <span className="text-muted-foreground">-</span>}
+                          {user.first_name && user.last_name
+                            ? `${user.first_name} ${user.last_name}`
+                            : <span className="text-muted-foreground">-</span>}
                         </td>
                         <td className="p-4 text-sm">{user.email}</td>
                         <td className="p-4">

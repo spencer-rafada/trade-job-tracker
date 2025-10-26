@@ -31,7 +31,17 @@ export const ROUTES = {
   WORKER: {
     HOURS: "/worker/hours",
   },
+
+  // Settings routes (accessible to all authenticated users)
+  SETTINGS: {
+    PROFILE: "/settings/profile",
+  },
 } as const;
 
 // Type for route values
-export type Route = typeof ROUTES[keyof typeof ROUTES] | typeof ROUTES.AUTH[keyof typeof ROUTES.AUTH] | typeof ROUTES.ADMIN[keyof typeof ROUTES.ADMIN] | typeof ROUTES.WORKER[keyof typeof ROUTES.WORKER];
+export type Route =
+  | (typeof ROUTES)[keyof typeof ROUTES]
+  | (typeof ROUTES.AUTH)[keyof typeof ROUTES.AUTH]
+  | (typeof ROUTES.ADMIN)[keyof typeof ROUTES.ADMIN]
+  | (typeof ROUTES.WORKER)[keyof typeof ROUTES.WORKER]
+  | (typeof ROUTES.SETTINGS)[keyof typeof ROUTES.SETTINGS];
