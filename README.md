@@ -10,18 +10,31 @@ This application helps trade businesses track jobs completed by their crews. For
 
 ### Must Have (MVP - Iteration 1)
 
-#### Job Tracking ✅
+#### Job Tracking ✅ (Redesigned - See docs/JOB_LOGGING_REDESIGN.md)
 
-- **Job Fields:** ✅
-  - ~~Date (auto-populated on submission)~~
-  - ~~Job name/number~~
-  - ~~Elevation~~
-  - ~~Lot/Address~~
-  - ~~Yardage (numeric input)~~
-  - ~~Rate (dollar amount)~~
-  - ~~Total (auto-calculated: yardage × rate)~~
-  - ~~Crew ID (auto-populated based on user's crew)~~
+- **Admin Job Template Management:** ✅
+  - ~~Create job templates (job name)~~
+  - ~~Add multiple elevations per job~~
+  - ~~Set yardage and rate per elevation~~
+  - ~~Archive/reactivate jobs~~
+  - ~~No crew assignment (jobs available to all crews)~~
+
+- **Foreman Job Logging:** ✅
+  - ~~Select job from dropdown (required)~~
+  - ~~Select elevation from dropdown (required)~~
+  - ~~Enter lot manually (required)~~
+  - ~~Yardage and rate are read-only (pulled from job template)~~
+  - ~~Date (auto-populated, editable)~~
   - ~~Notes (optional)~~
+  - ~~Crew ID (auto-populated based on user's crew)~~
+
+- **Job Logs View (Admin):** ✅
+  - ~~View all completed work logs~~
+  - ~~Filter by date range (This Week, Last Week, This Month, All)~~
+  - ~~Search by job, elevation, lot, crew, foreman~~
+  - ~~Sortable columns with TanStack Table~~
+  - ~~Stats dashboard (total logs, yardage, revenue)~~
+  - ~~Delete logs (admin only)~~
 
 #### User Roles & Authentication ✅
 
@@ -147,12 +160,15 @@ This application helps trade businesses track jobs completed by their crews. For
 
 ### Database Schema
 
+**Note:** Job tracking was redesigned in October 2024. See `docs/JOB_LOGGING_REDESIGN.md` for full details.
+
 ```sql
 -- Profiles (extends Supabase auth.users)
 profiles:
   - id (uuid, primary key, references auth.users)
   - email (text)
-  - full_name (text)
+  - first_name (text)
+  - last_name (text)
   - role (text: 'admin' | 'foreman' | 'worker')
   - hourly_rate (numeric, nullable) -- for minimum wage compliance
   - crew_id (uuid, references crews.id, nullable)
@@ -162,23 +178,48 @@ profiles:
 crews:
   - id (uuid, primary key)
   - name (text)
-  - trade (text, nullable) -- e.g., "Concrete", "Framing", "Electrical"
+  - trade_id (uuid, references trades.id, nullable)
   - created_at (timestamp)
 
--- Jobs
+-- Trades
+trades:
+  - id (uuid, primary key)
+  - trade_name (text) -- e.g., "Concrete", "Framing", "Electrical"
+  - department_id (text, nullable)
+  - description (text, nullable)
+  - created_at (timestamp)
+
+-- Jobs (Job Templates - Admin creates)
 jobs:
   - id (uuid, primary key)
-  - date (date, defaults to current date)
-  - job_name (text)
-  - elevation (text)
-  - lot_address (text)
-  - yardage (numeric)
-  - rate (numeric)
+  - job_name (text) -- e.g., "Riverside Apartments Phase 2"
+  - active (boolean, defaults to true)
+  - created_at (timestamp)
+  - updated_at (timestamp)
+
+-- Job Elevations (Multiple per job)
+job_elevations:
+  - id (uuid, primary key)
+  - job_id (uuid, references jobs.id)
+  - elevation_name (text) -- e.g., "3rd Floor", "Basement"
+  - yardage (numeric, must be > 0)
+  - rate (numeric, must be > 0)
   - total (numeric, computed: yardage * rate)
-  - crew_id (uuid, references crews.id)
-  - created_by (uuid, references profiles.id)
+  - created_at (timestamp)
+  - updated_at (timestamp)
+
+-- Job Logs (Foreman reports completed work)
+job_logs:
+  - id (uuid, primary key)
+  - job_id (uuid, references jobs.id)
+  - elevation_id (uuid, references job_elevations.id)
+  - lot (text) -- manually entered by foreman
+  - date_worked (date, defaults to current date)
+  - crew_id (uuid, references crews.id) -- which crew did the work
+  - created_by (uuid, references profiles.id) -- which foreman logged it
   - notes (text, nullable)
   - created_at (timestamp)
+  - updated_at (timestamp)
 
 -- Hours (for labor compliance tracking)
 hours:
@@ -195,14 +236,19 @@ hours:
 
 **Row Level Security (RLS) Policies:**
 
-- Admins can view and manage all data (jobs, hours, users, crews)
-- Foremen can only view/insert jobs for their assigned crew
-- Foremen can view hours for their crew members
-- Workers and foremen can insert/update/delete their own hours
-- Workers can view their own hour submissions only
-- Workers cannot view jobs or manage users
-- Users can only read their own profile
-- All security enforced at database level (not just frontend)
+- **Admins:** Full access to all data (job templates, elevations, job logs, hours, users, crews)
+- **Foremen:**
+  - Read access to all active job templates and elevations
+  - Can create job logs for their assigned crew only
+  - Can view job logs for their crew
+  - Can view hours for their crew members
+  - Can insert/update/delete their own hours
+- **Workers:**
+  - Can insert/update/delete their own hours
+  - Can view their own hour submissions only
+  - Cannot view jobs or manage users
+- **All Users:** Can only read their own profile
+- **All security enforced at database level** (not just frontend)
 
 ## Next Steps
 
@@ -278,6 +324,22 @@ For questions or feedback, contact [your contact info]
 
 ---
 
-**Last Updated:** October 18, 2025  
-**Version:** 1.0.0 (MVP)  
+**Last Updated:** October 29, 2024
+**Version:** 1.1.0 (Job Logging Redesign)
 **Status:** In Development
+
+## Recent Changes
+
+### October 29, 2024 - Job Logging Redesign ✅
+
+Complete overhaul of the job management system to improve workflow and data accuracy:
+
+- **Admin creates job templates** - standardizes job names, elevations, and rates
+- **Foremen log completed work** - select from dropdowns instead of manual entry
+- **Separation of concerns** - job templates vs. work logs
+- **Better accounting** - all work logs tied to job_id for financial tracking
+- **No crew assignments** - any crew can work any job
+- **Required fields** - job, elevation, and lot are now mandatory
+- **Full table filtering** - same powerful search/filter capabilities as before
+
+See `docs/JOB_LOGGING_REDESIGN.md` for complete technical documentation.

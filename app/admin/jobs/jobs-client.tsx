@@ -37,7 +37,8 @@ interface JobsPageClientProps {
   trades: Trade[];
   profile: {
     id: string;
-    full_name: string | null;
+    first_name: string;
+    last_name: string;
     role: string;
   };
 }
@@ -81,7 +82,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
         job.lot_address?.toLowerCase().includes(searchLower) ||
         job.elevation?.toLowerCase().includes(searchLower) ||
         job.crews?.name.toLowerCase().includes(searchLower) ||
-        job.profiles?.full_name?.toLowerCase().includes(searchLower) ||
+        `${job.profiles?.first_name || ''} ${job.profiles?.last_name || ''}`.toLowerCase().includes(searchLower) ||
         job.notes?.toLowerCase().includes(searchLower)
       );
     });

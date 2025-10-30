@@ -56,7 +56,6 @@ export function AuthButton() {
   return user && profile ? (
     <UserMenu
       firstName={profile.first_name || ""}
-      lastName={profile.last_name || ""}
       email={user.email || ""}
     />
   ) : user ? (

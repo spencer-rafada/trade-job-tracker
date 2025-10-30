@@ -34,6 +34,9 @@ export default async function AdminHoursPage() {
               <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
               </Link>
+              <Link href={ROUTES.ADMIN.JOB_LOGS} className="hover:underline">
+                Job Logs
+              </Link>
               <Link href={ROUTES.ADMIN.HOURS} className="underline font-semibold">
                 Hours
               </Link>

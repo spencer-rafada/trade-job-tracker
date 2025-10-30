@@ -1,12 +1,10 @@
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/db/actions/user-actions";
-import { getAllJobs } from "@/db/actions/job-actions";
-import { getAllCrews } from "@/db/actions/crew-actions";
-import { getAllTrades } from "@/db/actions/trade-actions";
+import { getJobsWithElevations } from "@/db/actions/job-template-actions";
 import { ROUTES } from "@/lib/routes";
-import { JobsPageClient } from "./jobs-client";
+import { JobTemplatesClient } from "./job-templates-client";
 
-export default async function JobsPage() {
+export default async function JobTemplatesPage() {
   // Check authentication and authorization
   const profile = await requireAdmin();
 
@@ -14,10 +12,8 @@ export default async function JobsPage() {
     redirect(ROUTES.AUTH.LOGIN);
   }
 
-  // Fetch all jobs, crews, and trades
-  const jobs = await getAllJobs();
-  const crews = await getAllCrews();
-  const trades = await getAllTrades();
+  // Fetch all job templates with their elevations
+  const jobsWithElevations = await getJobsWithElevations();
 
-  return <JobsPageClient jobs={jobs} crews={crews} trades={trades} profile={profile} />;
+  return <JobTemplatesClient jobsWithElevations={jobsWithElevations} profile={profile} />;
 }

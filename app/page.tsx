@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/routes";
 import { getCurrentUser, getUserProfile } from "@/db/actions/user-actions";
-import { getJobStats } from "@/db/actions/job-actions";
+import { getJobLogStats } from "@/db/actions/job-log-actions";
 import { ForemanDashboard } from "@/components/foreman-dashboard";
 import { AdminDashboard } from "@/components/admin-dashboard";
 import { WorkerDashboard } from "@/components/worker-dashboard";
@@ -27,8 +27,8 @@ export default async function DashboardPage() {
 
   // Render role-based dashboard
   if (profile.role === "admin") {
-    // Fetch all-time job stats for admin dashboard
-    const stats = await getJobStats();
+    // Fetch all-time job log stats for admin dashboard
+    const stats = await getJobLogStats();
     return <AdminDashboard stats={stats} />;
   }
 

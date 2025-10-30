@@ -23,7 +23,7 @@ export function Toolbar({
       {/* Search Input */}
       <div className="flex items-center gap-2">
         <Input
-          placeholder="Search jobs by name, address, elevation..."
+          placeholder="Search by job, elevation, lot, crew, foreman..."
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           className="max-w-sm"
@@ -67,7 +67,7 @@ export function Toolbar({
           onClick={() => onFilterChange("all")}
           size="sm"
         >
-          All Jobs
+          All Logs
         </Button>
       </div>
     </div>

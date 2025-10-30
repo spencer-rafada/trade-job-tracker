@@ -1,17 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Job } from "@/lib/types";
+import { JobLog } from "@/lib/types/job";
 import { formatDate, formatCurrency, formatNumber } from "@/lib/utils/date-helpers";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown, Trash2 } from "lucide-react";
+import { deleteJobLog } from "@/db/actions/job-log-actions";
 import {
   Select,
   SelectContent,
@@ -35,9 +29,9 @@ type Trade = {
   trade_name: string;
 };
 
-export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] => [
+export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<JobLog>[] => [
   {
-    accessorKey: "date",
+    accessorKey: "date_worked",
     header: ({ column }) => {
       return (
         <Button
@@ -50,11 +44,12 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
       );
     },
     cell: ({ row }) => {
-      return <div className="font-medium">{formatDate(row.getValue("date"))}</div>;
+      return <div className="font-medium">{formatDate(row.getValue("date_worked"))}</div>;
     },
   },
   {
-    accessorKey: "job_name",
+    accessorKey: "jobs.job_name",
+    id: "job_name",
     header: ({ column }) => {
       return (
         <Button
@@ -66,23 +61,28 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return <div>{row.original.jobs?.job_name || "N/A"}</div>;
+    },
   },
   {
-    accessorKey: "elevation",
+    accessorKey: "job_elevations.elevation_name",
+    id: "elevation",
     header: "Elevation",
     cell: ({ row }) => {
-      return <div>{row.getValue("elevation") || "-"}</div>;
+      return <div>{row.original.job_elevations?.elevation_name || "-"}</div>;
     },
   },
   {
-    accessorKey: "lot_address",
-    header: "Lot/Address",
+    accessorKey: "lot",
+    header: "Lot",
     cell: ({ row }) => {
-      return <div className="max-w-[200px] truncate">{row.getValue("lot_address") || "-"}</div>;
+      return <div className="max-w-[200px] truncate">{row.getValue("lot") || "-"}</div>;
     },
   },
   {
-    accessorKey: "yardage",
+    accessorKey: "job_elevations.yardage",
+    id: "yardage",
     header: ({ column }) => {
       return (
         <Button
@@ -95,11 +95,13 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-right font-medium">{formatNumber(row.getValue("yardage"))}</div>;
+      const yardage = row.original.job_elevations?.yardage || 0;
+      return <div className="text-right font-medium">{formatNumber(yardage)}</div>;
     },
   },
   {
-    accessorKey: "rate",
+    accessorKey: "job_elevations.rate",
+    id: "rate",
     header: ({ column }) => {
       return (
         <Button
@@ -112,11 +114,13 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-right font-medium">{formatCurrency(row.getValue("rate"))}</div>;
+      const rate = row.original.job_elevations?.rate || 0;
+      return <div className="text-right font-medium">{formatCurrency(rate)}</div>;
     },
   },
   {
-    accessorKey: "total",
+    accessorKey: "job_elevations.total",
+    id: "total",
     header: ({ column }) => {
       return (
         <Button
@@ -129,7 +133,8 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-right font-medium">{formatCurrency(row.getValue("total"))}</div>;
+      const total = row.original.job_elevations?.total || 0;
+      return <div className="text-right font-medium text-green-600 dark:text-green-400">{formatCurrency(total)}</div>;
     },
   },
   {
@@ -219,45 +224,43 @@ export const getColumns = (crews: Crew[], trades?: Trade[]): ColumnDef<Job>[] =>
     filterFn: (row, id, value) => {
       return row.getValue(id) === value;
     },
-  }] as ColumnDef<Job>[] : []),
+  }] as ColumnDef<JobLog>[] : []),
   {
-    id: "created_by",
-    header: "Created By",
+    id: "foreman",
+    header: "Foreman",
     cell: ({ row }) => {
       const profile = row.original.profiles;
       const name = profile?.first_name && profile?.last_name
         ? `${profile.first_name} ${profile.last_name}`
-        : profile?.email || "Unknown";
+        : "Unknown";
       return <div>{name}</div>;
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const job = row.original;
+      const log = row.original;
+
+      const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this job log?")) return;
+
+        try {
+          await deleteJobLog(log.id);
+          window.location.reload(); // Refresh to show updated data
+        } catch (error) {
+          console.error("Error deleting job log:", error);
+          alert("Failed to delete job log");
+        }
+      };
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(job.id)}
-            >
-              Copy job ID
-            </DropdownMenuItem>
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit job</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
-              Delete job
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleDelete}
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
       );
     },
   },
