@@ -234,7 +234,10 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string): P
 
   // Calculate totals from job logs
   const totalJobEarnings = jobLogs?.reduce(
-    (sum, log) => sum + Number(log.job_elevations?.total || 0),
+    (sum, log) => {
+      const elevationData = log.job_elevations as any;
+      return sum + Number(elevationData?.total || 0);
+    },
     0
   ) || 0;
 

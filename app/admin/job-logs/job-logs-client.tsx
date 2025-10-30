@@ -17,21 +17,6 @@ import {
 } from "@/lib/utils/date-helpers";
 import { BarChart3, DollarSign, Package } from "lucide-react";
 
-type Crew = {
-  id: string;
-  name: string;
-  trade_id: string | null;
-  trades: {
-    id: string;
-    trade_name: string;
-  } | null;
-};
-
-type Trade = {
-  id: string;
-  trade_name: string;
-};
-
 interface JobLogsClientProps {
   initialJobLogs: JobLog[];
   profile: {

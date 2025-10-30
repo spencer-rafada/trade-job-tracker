@@ -14,17 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Edit2, Trash2, Archive, ArchiveRestore } from "lucide-react";
+import { Plus, Trash2, Archive, ArchiveRestore } from "lucide-react";
 import { JobTemplate, JobElevation } from "@/lib/types/job";
 import {
   createJobTemplate,
-  updateJobTemplate,
   deleteJobTemplate,
   archiveJobTemplate,
   reactivateJobTemplate,
   addElevationToJob,
-  updateElevation,
-  deleteElevation,
+  deleteElevation
 } from "@/db/actions/job-template-actions";
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
@@ -32,19 +30,17 @@ import Link from "next/link";
 
 type JobWithElevations = JobTemplate & { job_elevations: JobElevation[] };
 
-type Profile = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-};
-
 type Props = {
   jobsWithElevations: JobWithElevations[];
-  profile: Profile;
+  profile: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    role: string;
+  };
 };
 
-export function JobTemplatesClient({ jobsWithElevations: initialJobs, profile }: Props) {
+export function JobTemplatesClient({ jobsWithElevations: initialJobs }: Props) {
   const [jobs, setJobs] = useState<JobWithElevations[]>(initialJobs);
   const [isAddJobOpen, setIsAddJobOpen] = useState(false);
   const [isAddElevationOpen, setIsAddElevationOpen] = useState(false);

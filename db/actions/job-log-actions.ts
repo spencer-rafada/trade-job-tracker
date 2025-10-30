@@ -294,11 +294,17 @@ export async function getJobLogStats(startDate?: string, endDate?: string) {
   const stats = {
     totalJobs: data.length,
     totalYardage: data.reduce(
-      (sum, log) => sum + (log.job_elevations?.yardage || 0),
+      (sum, log) => {
+        const elevationData = log.job_elevations as any;
+        return sum + (elevationData?.yardage || 0);
+      },
       0
     ),
     totalRevenue: data.reduce(
-      (sum, log) => sum + (log.job_elevations?.total || 0),
+      (sum, log) => {
+        const elevationData = log.job_elevations as any;
+        return sum + (elevationData?.total || 0);
+      },
       0
     ),
   };
@@ -343,11 +349,17 @@ export async function getCrewJobLogStats(
   const stats = {
     totalJobs: data.length,
     totalYardage: data.reduce(
-      (sum, log) => sum + (log.job_elevations?.yardage || 0),
+      (sum, log) => {
+        const elevationData = log.job_elevations as any;
+        return sum + (elevationData?.yardage || 0);
+      },
       0
     ),
     totalRevenue: data.reduce(
-      (sum, log) => sum + (log.job_elevations?.total || 0),
+      (sum, log) => {
+        const elevationData = log.job_elevations as any;
+        return sum + (elevationData?.total || 0);
+      },
       0
     ),
   };

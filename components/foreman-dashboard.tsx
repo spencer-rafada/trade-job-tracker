@@ -15,12 +15,12 @@ import {
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import { createJobLog, type JobLogFormData } from "@/db/actions/job-log-actions";
+import { createJobLog } from "@/db/actions/job-log-actions";
 import {
   getActiveJobTemplates,
   getElevationsByJob,
 } from "@/db/actions/job-template-actions";
-import { JobTemplate, JobElevation } from "@/lib/types/job";
+import { JobTemplate, JobElevation, JobLogFormData } from "@/lib/types/job";
 import { Clock } from "lucide-react";
 
 type Profile = {
