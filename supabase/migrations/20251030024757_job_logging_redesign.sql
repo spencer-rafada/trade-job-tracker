@@ -81,9 +81,10 @@ alter table "public"."jobs" drop column "lot_address";
 
 alter table "public"."jobs" drop column "notes";
 
-alter table "public"."jobs" drop column "rate";
-
+-- Drop generated column first before dropping its dependencies
 alter table "public"."jobs" drop column "total";
+
+alter table "public"."jobs" drop column "rate";
 
 alter table "public"."jobs" drop column "yardage";
 
