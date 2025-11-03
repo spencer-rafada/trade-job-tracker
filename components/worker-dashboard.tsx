@@ -9,7 +9,8 @@ import { Clock, Calendar } from "lucide-react";
 
 type Profile = {
   id: string;
-  full_name: string | null;
+  first_name: string;
+  last_name: string;
   role: string;
   crew_id: string | null;
   hourly_rate: number | null;
@@ -36,7 +37,7 @@ export function WorkerDashboard({ profile }: { profile: Profile }) {
       <main className="flex-1 w-full max-w-4xl mx-auto p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {profile.full_name || "Worker"}!
+            Welcome back, {profile.first_name} {profile.last_name}!
           </h1>
           <p className="text-muted-foreground">
             {profile.crews ? `${profile.crews.name} Crew` : "No crew assigned"}
@@ -102,7 +103,7 @@ export function WorkerDashboard({ profile }: { profile: Profile }) {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Your hourly rate hasn't been set yet. Please contact your administrator
+                Your hourly rate hasn&apos;t been set yet. Please contact your administrator
                 to have your hourly rate configured before submitting hours.
               </p>
             </CardContent>

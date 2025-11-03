@@ -24,6 +24,7 @@ export const ROUTES = {
     CREWS: "/admin/crews",
     TRADES: "/admin/trades",
     JOBS: "/admin/jobs",
+    JOB_LOGS: "/admin/job-logs",
     HOURS: "/admin/hours",
   },
 

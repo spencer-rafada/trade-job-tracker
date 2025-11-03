@@ -12,15 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
-import { formatUserGreeting } from "@/lib/utils/format";
 
 interface UserMenuProps {
   firstName: string;
-  lastName: string;
   email: string;
 }
 
-export function UserMenu({ firstName, lastName, email }: UserMenuProps) {
+export function UserMenu({ firstName, email }: UserMenuProps) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -30,7 +28,6 @@ export function UserMenu({ firstName, lastName, email }: UserMenuProps) {
     router.refresh();
   };
 
-  const displayName = formatUserGreeting(firstName, lastName);
   const fallbackName = email.split("@")[0]; // Use email username as fallback
 
   return (

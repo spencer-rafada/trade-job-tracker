@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import type { WeeklyCrewSummary } from "@/lib/types/hours";
 
 export type HoursInput = {
   date_worked: string; // YYYY-MM-DD format
@@ -171,7 +172,7 @@ export async function getAllHours(startDate?: string, endDate?: string) {
 /**
  * Get weekly summary for a crew
  */
-export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
+export async function getWeeklyCrewSummary(crewId: string, weekStart: string): Promise<WeeklyCrewSummary | null> {
   const supabase = await createClient();
 
   // Calculate week end (7 days from start)
@@ -213,23 +214,42 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
     return null;
   }
 
-  // Get all jobs for this crew in this week
-  const { data: jobs, error: jobsError } = await supabase
-    .from("jobs")
-    .select("total")
+  // Get all job logs for this crew in this week
+  const { data: jobLogs, error: jobsError } = await supabase
+    .from("job_logs")
+    .select(`
+      id,
+      job_elevations (
+        total
+      )
+    `)
     .eq("crew_id", crewId)
-    .gte("date", weekStart)
-    .lte("date", weekEndStr);
+    .gte("date_worked", weekStart)
+    .lte("date_worked", weekEndStr);
 
   if (jobsError) {
-    console.error("Error fetching crew jobs:", jobsError);
+    console.error("Error fetching crew job logs:", jobsError);
     return null;
   }
 
-  // Calculate totals
-  const totalJobEarnings = jobs?.reduce((sum, job) => sum + Number(job.total), 0) || 0;
+  // Calculate totals from job logs
+  const totalJobEarnings = jobLogs?.reduce(
+    (sum, log) => {
+      const elevationData = log.job_elevations as any;
+      return sum + Number(elevationData?.total || 0);
+    },
+    0
+  ) || 0;
 
   // Group hours by worker
+  type WorkerSummaryMap = Record<string, {
+    worker_id: string;
+    full_name: string;
+    hourly_rate: number;
+    total_hours: number;
+    minimum_required_pay: number;
+  }>;
+
   const workerSummaries = hours?.reduce((acc, hour) => {
     const workerId = hour.worker_id;
     if (!acc[workerId]) {
@@ -247,9 +267,15 @@ export async function getWeeklyCrewSummary(crewId: string, weekStart: string) {
     acc[workerId].minimum_required_pay =
       acc[workerId].total_hours * acc[workerId].hourly_rate;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as WorkerSummaryMap);
 
-  const workers = Object.values(workerSummaries || {});
+  const workers = Object.values(workerSummaries || {}) as Array<{
+    worker_id: string;
+    full_name: string;
+    hourly_rate: number;
+    total_hours: number;
+    minimum_required_pay: number;
+  }>;
   const totalMinimumRequired = workers.reduce(
     (sum, w) => sum + w.minimum_required_pay, 0
   );

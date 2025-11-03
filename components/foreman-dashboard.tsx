@@ -1,19 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
-import { createJob, type JobFormData } from "@/db/actions/job-actions";
+import { createJobLog } from "@/db/actions/job-log-actions";
+import {
+  getActiveJobTemplates,
+  getElevationsByJob,
+} from "@/db/actions/job-template-actions";
+import { JobTemplate, JobElevation, JobLogFormData } from "@/lib/types/job";
 import { Clock } from "lucide-react";
 
 type Profile = {
   id: string;
-  full_name: string | null;
+  first_name: string;
+  last_name: string;
   role: string;
   crew_id: string | null;
   crews: {
@@ -26,6 +39,49 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Job and elevation state
+  const [jobs, setJobs] = useState<JobTemplate[]>([]);
+  const [elevations, setElevations] = useState<JobElevation[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [selectedElevationId, setSelectedElevationId] = useState<string>("");
+  const [selectedElevation, setSelectedElevation] = useState<JobElevation | null>(null);
+
+  // Load active jobs on component mount
+  useEffect(() => {
+    async function loadJobs() {
+      try {
+        const activeJobs = await getActiveJobTemplates();
+        setJobs(activeJobs);
+      } catch (error) {
+        console.error("Error loading jobs:", error);
+        setMessage({ type: "error", text: "Failed to load jobs" });
+      }
+    }
+    loadJobs();
+  }, []);
+
+  // Handle job selection - load elevations for selected job
+  const handleJobChange = async (jobId: string) => {
+    setSelectedJobId(jobId);
+    setSelectedElevationId("");
+    setSelectedElevation(null);
+
+    try {
+      const jobElevations = await getElevationsByJob(jobId);
+      setElevations(jobElevations);
+    } catch (error) {
+      console.error("Error loading elevations:", error);
+      setMessage({ type: "error", text: "Failed to load elevations" });
+    }
+  };
+
+  // Handle elevation selection - update selected elevation details
+  const handleElevationChange = (elevationId: string) => {
+    setSelectedElevationId(elevationId);
+    const elevation = elevations.find((e) => e.id === elevationId);
+    setSelectedElevation(elevation || null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -33,29 +89,35 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
 
     const formData = new FormData(e.currentTarget);
 
-    const jobData: JobFormData = {
-      job_name: formData.get("job_name") as string,
-      elevation: formData.get("elevation") as string,
-      lot_address: formData.get("lot_address") as string,
-      yardage: parseFloat(formData.get("yardage") as string),
-      rate: parseFloat(formData.get("rate") as string),
-      crew_id: profile.crew_id!,
-      notes: formData.get("notes") as string,
-      date: formData.get("date") as string,
+    const jobLogData: JobLogFormData = {
+      job_id: selectedJobId,
+      elevation_id: selectedElevationId,
+      lot: formData.get("lot") as string,
+      date_worked: formData.get("date") as string || undefined,
+      notes: formData.get("notes") as string || undefined,
     };
 
-    const result = await createJob(jobData);
+    try {
+      await createJobLog(jobLogData);
+      setMessage({ type: "success", text: "Work logged successfully!" });
 
-    setLoading(false);
-
-    if (result.success) {
-      setMessage({ type: "success", text: "Job added successfully!" });
       // Reset form
       (e.target as HTMLFormElement).reset();
+      setSelectedJobId("");
+      setSelectedElevationId("");
+      setSelectedElevation(null);
+      setElevations([]);
+
       // Auto-clear success message after 3 seconds
       setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: "error", text: result.error || "Failed to add job" });
+    } catch (error) {
+      console.error("Error logging work:", error);
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Failed to log work"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,9 +173,9 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-3xl mx-auto p-4 md:p-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Add Job</h1>
+          <h1 className="text-3xl font-bold mb-2">Log Completed Work</h1>
           <p className="text-muted-foreground">
-            Log a new job for {profile.crews?.name}
+            Report work completed by {profile.crews?.name}
           </p>
         </div>
 
@@ -144,68 +206,105 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
                 />
               </div>
 
-              {/* Job Name */}
+              {/* Job Selection */}
               <div className="space-y-2">
-                <Label htmlFor="job_name">Job Name/Number *</Label>
-                <Input
-                  id="job_name"
-                  name="job_name"
-                  type="text"
-                  placeholder="e.g., Smith Residence"
+                <Label htmlFor="job_id">Job *</Label>
+                <Select
+                  value={selectedJobId}
+                  onValueChange={handleJobChange}
                   required
+                >
+                  <SelectTrigger className="text-lg">
+                    <SelectValue placeholder="Select a job" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobs.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        No active jobs available
+                      </div>
+                    ) : (
+                      jobs.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                          {job.job_name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Elevation Selection (only show if job selected) */}
+              {selectedJobId && (
+                <div className="space-y-2">
+                  <Label htmlFor="elevation_id">Elevation *</Label>
+                  <Select
+                    value={selectedElevationId}
+                    onValueChange={handleElevationChange}
+                    required
+                  >
+                    <SelectTrigger className="text-lg">
+                      <SelectValue placeholder="Select elevation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {elevations.length === 0 ? (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          No elevations available for this job
+                        </div>
+                      ) : (
+                        elevations.map((elev) => (
+                          <SelectItem key={elev.id} value={elev.id}>
+                            {elev.elevation_name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Display elevation details (read-only) */}
+              {selectedElevation && (
+                <div className="p-4 bg-muted rounded-lg space-y-2 border">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Work Details
+                  </p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Yardage</p>
+                      <p className="text-lg font-semibold">
+                        {selectedElevation.yardage} yds
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Rate</p>
+                      <p className="text-lg font-semibold">
+                        ${selectedElevation.rate}/yd
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Total</p>
+                      <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                        ${selectedElevation.total.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Lot (manual entry) */}
+              <div className="space-y-2">
+                <Label htmlFor="lot">Lot *</Label>
+                <Input
+                  id="lot"
+                  name="lot"
+                  type="text"
+                  placeholder="e.g., Lot 42-B"
                   className="text-lg"
+                  required
                 />
-              </div>
-
-              {/* Elevation */}
-              <div className="space-y-2">
-                <Label htmlFor="elevation">Elevation</Label>
-                <Input
-                  id="elevation"
-                  name="elevation"
-                  type="text"
-                  placeholder="e.g., 3rd Floor"
-                />
-              </div>
-
-              {/* Lot/Address */}
-              <div className="space-y-2">
-                <Label htmlFor="lot_address">Lot/Address</Label>
-                <Input
-                  id="lot_address"
-                  name="lot_address"
-                  type="text"
-                  placeholder="e.g., 123 Main St"
-                />
-              </div>
-
-              {/* Yardage & Rate (side by side on desktop) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="yardage">Yardage *</Label>
-                  <Input
-                    id="yardage"
-                    name="yardage"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    required
-                    className="text-lg"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rate">Rate ($) *</Label>
-                  <Input
-                    id="rate"
-                    name="rate"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    required
-                    className="text-lg"
-                  />
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Enter lot number for accounting reconciliation
+                </p>
               </div>
 
               {/* Notes */}
@@ -223,10 +322,10 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !selectedJobId || !selectedElevationId}
                 className="w-full h-12 text-lg"
               >
-                {loading ? "Adding Job..." : "Add Job"}
+                {loading ? "Logging Work..." : "Log Work"}
               </Button>
             </form>
           </CardContent>

@@ -5,7 +5,8 @@ import Link from "next/link";
 import { AuthButton } from "@/components/auth-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JobTable, getColumns, Toolbar } from "@/components/job-table";
-import { Job, FilterPreset, JobStats } from "@/lib/types";
+import { JobLog, JobStats } from "@/lib/types/job";
+import { FilterPreset } from "@/lib/types";
 import { ROUTES } from "@/lib/routes";
 import {
   getThisWeekRange,
@@ -16,39 +17,23 @@ import {
 } from "@/lib/utils/date-helpers";
 import { BarChart3, DollarSign, Package } from "lucide-react";
 
-type Crew = {
-  id: string;
-  name: string;
-  trade_id: string | null;
-  trades: {
-    id: string;
-    trade_name: string;
-  } | null;
-};
-
-type Trade = {
-  id: string;
-  trade_name: string;
-};
-
-interface JobsPageClientProps {
-  jobs: Job[];
-  crews: Crew[];
-  trades: Trade[];
+interface JobLogsClientProps {
+  initialJobLogs: JobLog[];
   profile: {
     id: string;
-    full_name: string | null;
+    first_name: string;
+    last_name: string;
     role: string;
   };
 }
 
-export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
+export function JobLogsClient({ initialJobLogs }: JobLogsClientProps) {
   const [searchValue, setSearchValue] = React.useState("");
   const [activeFilter, setActiveFilter] = React.useState<FilterPreset>("all");
 
-  // Filter jobs by date range
+  // Filter job logs by date range
   const filteredByDate = React.useMemo(() => {
-    if (activeFilter === "all") return jobs;
+    if (activeFilter === "all") return initialJobLogs;
 
     let dateRange;
     switch (activeFilter) {
@@ -62,39 +47,50 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
         dateRange = getThisMonthRange();
         break;
       default:
-        return jobs;
+        return initialJobLogs;
     }
 
-    return jobs.filter((job) => {
-      return job.date >= dateRange.startDate && job.date <= dateRange.endDate;
+    return initialJobLogs.filter((log) => {
+      return log.date_worked >= dateRange.startDate && log.date_worked <= dateRange.endDate;
     });
-  }, [jobs, activeFilter]);
+  }, [initialJobLogs, activeFilter]);
 
   // Filter by search term
-  const filteredJobs = React.useMemo(() => {
+  const filteredLogs = React.useMemo(() => {
     if (!searchValue) return filteredByDate;
 
     const searchLower = searchValue.toLowerCase();
-    return filteredByDate.filter((job) => {
+    return filteredByDate.filter((log) => {
       return (
-        job.job_name?.toLowerCase().includes(searchLower) ||
-        job.lot_address?.toLowerCase().includes(searchLower) ||
-        job.elevation?.toLowerCase().includes(searchLower) ||
-        job.crews?.name.toLowerCase().includes(searchLower) ||
-        job.profiles?.full_name?.toLowerCase().includes(searchLower) ||
-        job.notes?.toLowerCase().includes(searchLower)
+        log.jobs?.job_name?.toLowerCase().includes(searchLower) ||
+        log.lot?.toLowerCase().includes(searchLower) ||
+        log.job_elevations?.elevation_name?.toLowerCase().includes(searchLower) ||
+        log.crews?.name.toLowerCase().includes(searchLower) ||
+        `${log.profiles?.first_name || ''} ${log.profiles?.last_name || ''}`.toLowerCase().includes(searchLower) ||
+        log.notes?.toLowerCase().includes(searchLower)
       );
     });
   }, [filteredByDate, searchValue]);
 
-  // Calculate stats for filtered jobs
+  // Calculate stats for filtered logs
   const stats: JobStats = React.useMemo(() => {
     return {
-      totalJobs: filteredJobs.length,
-      totalYardage: filteredJobs.reduce((sum, job) => sum + Number(job.yardage), 0),
-      totalRevenue: filteredJobs.reduce((sum, job) => sum + Number(job.total), 0),
+      totalJobs: filteredLogs.length,
+      totalYardage: filteredLogs.reduce((sum, log) => sum + Number(log.job_elevations?.yardage || 0), 0),
+      totalRevenue: filteredLogs.reduce((sum, log) => sum + Number(log.job_elevations?.total || 0), 0),
     };
-  }, [filteredJobs]);
+  }, [filteredLogs]);
+
+  // Extract unique crews for column filtering (if needed)
+  const crews = React.useMemo(() => {
+    const uniqueCrews = new Map();
+    initialJobLogs.forEach(log => {
+      if (log.crews) {
+        uniqueCrews.set(log.crews.id, log.crews);
+      }
+    });
+    return Array.from(uniqueCrews.values());
+  }, [initialJobLogs]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -115,8 +111,11 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
               <Link href={ROUTES.ADMIN.TRADES} className="hover:underline">
                 Trades
               </Link>
-              <Link href={ROUTES.ADMIN.JOBS} className="underline font-semibold">
+              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
                 Jobs
+              </Link>
+              <Link href={ROUTES.ADMIN.JOB_LOGS} className="underline font-semibold">
+                Job Logs
               </Link>
               <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
                 Hours
@@ -130,9 +129,9 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
       {/* Main Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Job Management</h1>
+          <h1 className="text-3xl font-bold mb-2">Job Logs</h1>
           <p className="text-muted-foreground">
-            View and manage all jobs across all crews
+            View all completed work logged by foremen
           </p>
         </div>
 
@@ -140,7 +139,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
         <div className="grid gap-4 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Logs</CardTitle>
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -159,7 +158,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
             <CardContent>
               <div className="text-2xl font-bold">{formatNumber(stats.totalYardage)}</div>
               <p className="text-xs text-muted-foreground">
-                Across all filtered jobs
+                Across all filtered logs
               </p>
             </CardContent>
           </Card>
@@ -170,7 +169,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(stats.totalRevenue)}</div>
               <p className="text-xs text-muted-foreground">
                 {activeFilter === "all" ? "All time" : "Filtered view"}
               </p>
@@ -181,7 +180,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
         {/* Toolbar and Table */}
         <Card>
           <CardHeader>
-            <CardTitle>All Jobs</CardTitle>
+            <CardTitle>All Job Logs</CardTitle>
           </CardHeader>
           <CardContent>
             <Toolbar
@@ -190,7 +189,7 @@ export function JobsPageClient({ jobs, crews, trades }: JobsPageClientProps) {
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
             />
-            <JobTable columns={getColumns(crews, trades)} data={filteredJobs} />
+            <JobTable columns={getColumns(crews)} data={filteredLogs} />
           </CardContent>
         </Card>
       </main>
