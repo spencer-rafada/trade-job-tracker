@@ -8,5 +8,6 @@ export type {
   ProfileWithCrew,
   ProfileUpdateInput,
   AdminProfileUpdateInput,
+  CreateUserInput,
   UserRole,
 } from "./profile";

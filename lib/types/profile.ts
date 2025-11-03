@@ -35,3 +35,14 @@ export interface AdminProfileUpdateInput extends ProfileUpdateInput {
   crew_id?: string | null;
   hourly_rate?: number | null;
 }
+
+export interface CreateUserInput {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone_number?: string | null;
+  role: UserRole;
+  crew_id?: string | null;
+  hourly_rate?: number | null;
+}
