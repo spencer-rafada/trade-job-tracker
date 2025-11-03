@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, getUserProfile, getAllUsers } from "@/db/actions/user-actions";
 import { getAllCrews } from "@/db/actions/crew-actions";
 import { UserManagement } from "@/components/user-management";
+import { CreateUserDialog } from "@/components/create-user-dialog";
 import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
@@ -58,11 +59,14 @@ export default async function UsersPage() {
 
       {/* Main Content */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">User Management</h1>
-          <p className="text-muted-foreground">
-            Manage foremen and assign them to crews
-          </p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">User Management</h1>
+            <p className="text-muted-foreground">
+              Manage users and assign them to crews
+            </p>
+          </div>
+          <CreateUserDialog crews={crews} />
         </div>
 
         <UserManagement users={users} crews={crews} />
