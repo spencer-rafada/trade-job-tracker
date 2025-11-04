@@ -157,18 +157,18 @@ export function AppSidebar() {
   );
 
   return (
-    <Sidebar collapsible="none">
+    <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={ROUTES.HOME}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Briefcase className="size-4" />
+                  <span className="text-xs font-bold">ACP</span>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    Trade Job Tracker
+                  <span className="font-semibold">
+                    ACE Commercial Plastering
                   </span>
                   <span className="truncate text-xs">
                     {profile?.role || "User"}

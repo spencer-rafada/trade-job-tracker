@@ -1,13 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { AuthButton } from "@/components/auth-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JobTable, getColumns, Toolbar } from "@/components/job-table";
 import { JobLog, JobStats } from "@/lib/types/job";
 import { FilterPreset } from "@/lib/types";
-import { ROUTES } from "@/lib/routes";
 import {
   getThisWeekRange,
   getLastWeekRange,
@@ -93,47 +90,13 @@ export function JobLogsClient({ initialJobLogs }: JobLogsClientProps) {
   }, [initialJobLogs]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="w-full border-b h-16 flex items-center px-4">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
-            <Link href={ROUTES.HOME} className="font-bold text-lg">
-              Trade Job Tracker
-            </Link>
-            <div className="hidden md:flex gap-4 text-sm">
-              <Link href={ROUTES.ADMIN.USERS} className="hover:underline">
-                Users
-              </Link>
-              <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
-                Crews
-              </Link>
-              <Link href={ROUTES.ADMIN.TRADES} className="hover:underline">
-                Trades
-              </Link>
-              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
-                Jobs
-              </Link>
-              <Link href={ROUTES.ADMIN.JOB_LOGS} className="underline font-semibold">
-                Job Logs
-              </Link>
-              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
-                Hours
-              </Link>
-            </div>
-          </div>
-          <AuthButton />
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Job Logs</h1>
-          <p className="text-muted-foreground">
-            View all completed work logged by foremen
-          </p>
-        </div>
+    <>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Job Logs</h1>
+        <p className="text-muted-foreground">
+          View all completed work logged by foremen
+        </p>
+      </div>
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
@@ -192,12 +155,6 @@ export function JobLogsClient({ initialJobLogs }: JobLogsClientProps) {
             <JobTable columns={getColumns(crews)} data={filteredLogs} />
           </CardContent>
         </Card>
-      </main>
-
-      {/* Footer */}
-      <footer className="w-full border-t py-4 text-center text-sm text-muted-foreground">
-        <p>Trade Job Tracker © 2025</p>
-      </footer>
-    </div>
+    </>
   );
 }
