@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { Clock, Calendar } from "lucide-react";
@@ -23,16 +22,6 @@ type Profile = {
 export function WorkerDashboard({ profile }: { profile: Profile }) {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="w-full border-b h-16 flex items-center px-4">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <Link href={ROUTES.HOME} className="font-bold text-lg">
-            Trade Job Tracker
-          </Link>
-          <AuthButton />
-        </div>
-      </nav>
-
       {/* Main Content */}
       <main className="flex-1 w-full max-w-4xl mx-auto p-4 md:p-8">
         <div className="mb-8">
@@ -110,11 +99,6 @@ export function WorkerDashboard({ profile }: { profile: Profile }) {
           </Card>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="w-full border-t py-4 text-center text-sm text-muted-foreground">
-        <p>Trade Job Tracker © 2025</p>
-      </footer>
     </div>
   );
 }

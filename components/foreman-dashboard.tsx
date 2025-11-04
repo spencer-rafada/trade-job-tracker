@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AuthButton } from "@/components/auth-button";
 import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { createJobLog } from "@/db/actions/job-log-actions";
@@ -124,15 +123,6 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
   if (!profile.crew_id) {
     return (
       <div className="min-h-screen flex flex-col">
-        <nav className="w-full border-b h-16 flex items-center px-4">
-          <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-            <Link href={ROUTES.HOME} className="font-bold text-lg">
-              Trade Job Tracker
-            </Link>
-            <AuthButton />
-          </div>
-        </nav>
-
         <main className="flex-1 flex items-center justify-center p-4">
           <Card className="max-w-md w-full">
             <CardHeader>
@@ -155,21 +145,6 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="w-full border-b h-16 flex items-center px-4">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href={ROUTES.HOME} className="font-bold text-lg">
-              Trade Job Tracker
-            </Link>
-            <span className="text-sm text-muted-foreground">
-              {profile.crews?.name}
-            </span>
-          </div>
-          <AuthButton />
-        </div>
-      </nav>
-
       {/* Main Content */}
       <main className="flex-1 w-full max-w-3xl mx-auto p-4 md:p-8">
         <div className="mb-6">
@@ -349,11 +324,6 @@ export function ForemanDashboard({ profile }: { profile: Profile }) {
           </CardContent>
         </Card>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full border-t py-4 text-center text-sm text-muted-foreground">
-        <p>Trade Job Tracker © 2025</p>
-      </footer>
     </div>
   );
 }

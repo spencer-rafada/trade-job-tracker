@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthButton } from "@/components/auth-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
@@ -15,50 +14,16 @@ interface AdminDashboardProps {
 
 export function AdminDashboard({ stats }: AdminDashboardProps) {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="w-full border-b h-16 flex items-center px-4">
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
-            <Link href={ROUTES.HOME} className="font-bold text-lg">
-              Trade Job Tracker
-            </Link>
-            <div className="hidden md:flex gap-4 text-sm">
-              <Link href={ROUTES.ADMIN.USERS} className="hover:underline">
-                Users
-              </Link>
-              <Link href={ROUTES.ADMIN.CREWS} className="hover:underline">
-                Crews
-              </Link>
-              <Link href={ROUTES.ADMIN.TRADES} className="hover:underline">
-                Trades
-              </Link>
-              <Link href={ROUTES.ADMIN.JOBS} className="hover:underline">
-                Jobs
-              </Link>
-              <Link href={ROUTES.ADMIN.JOB_LOGS} className="hover:underline">
-                Job Logs
-              </Link>
-              <Link href={ROUTES.ADMIN.HOURS} className="hover:underline">
-                Hours
-              </Link>
-            </div>
-          </div>
-          <AuthButton />
-        </div>
-      </nav>
+    <>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+        <p className="text-muted-foreground">
+          Manage your team, crews, and track all jobs
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage your team, crews, and track all jobs
-          </p>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
+      {/* Quick Stats */}
+      <div className="grid gap-4 md:grid-cols-3 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
@@ -101,10 +66,10 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               </p>
             </CardContent>
           </Card>
-        </div>
+      </div>
 
-        {/* Management Cards */}
-        <div className="grid gap-6 md:grid-cols-3">
+      {/* Management Cards */}
+      <div className="grid gap-6 md:grid-cols-3">
           {/* User Management */}
           <Card>
             <CardHeader>
@@ -158,10 +123,10 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               </Button>
             </CardContent>
           </Card>
-        </div>
+      </div>
 
-        {/* Job Management Card */}
-        <Card className="mt-8">
+      {/* Job Management Card */}
+      <Card className="mt-8">
           <CardHeader>
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
@@ -176,10 +141,10 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               <Link href={ROUTES.ADMIN.JOBS}>View All Jobs</Link>
             </Button>
           </CardContent>
-        </Card>
+      </Card>
 
-        {/* Hours Management Card */}
-        <Card className="mt-8">
+      {/* Hours Management Card */}
+      <Card className="mt-8">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
@@ -194,13 +159,7 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               <Link href={ROUTES.ADMIN.HOURS}>Manage Hours</Link>
             </Button>
           </CardContent>
-        </Card>
-      </main>
-
-      {/* Footer */}
-      <footer className="w-full border-t py-4 text-center text-sm text-muted-foreground">
-        <p>Trade Job Tracker © 2025</p>
-      </footer>
-    </div>
+      </Card>
+    </>
   );
 }
